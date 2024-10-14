@@ -1,8 +1,8 @@
-"""create initial user model
+""" create initial user model
 
-Revision ID: 48b8d1228020
+Revision ID: 8982d3ce8b38
 Revises: 
-Create Date: 2024-10-13 00:45:49.309927
+Create Date: 2024-10-14 13:05:54.366146
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '48b8d1228020'
+revision = '8982d3ce8b38'
 down_revision = None
 branch_labels = None
 depends_on = None
