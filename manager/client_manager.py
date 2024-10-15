@@ -23,6 +23,7 @@ class ClientManager:
 
         client_data["password"] = generate_password_hash(client_data['password'], method='pbkdf2:sha256')
         client_data["role"] = RoleType.CLIENT.name
+        print(client_data)
         client = UserModel(**client_data)
         try:
             db.session.add(client)

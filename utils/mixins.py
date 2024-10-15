@@ -9,7 +9,6 @@ from db import db
 @declarative_mixin
 class PersonalInfoMixin:
     email: Mapped[str] = mapped_column(db.String(50), nullable=False, unique=True)
-    password: Mapped[str] = mapped_column(db.String(100), nullable=False)
     first_name: Mapped[str] = mapped_column(db.String(50), nullable=False)
     last_name: Mapped[str] = mapped_column(db.String(50), nullable=False)
     phone: Mapped[str] = mapped_column(db.String(20), unique=True)
@@ -30,6 +29,15 @@ class TimestampMixin:
 
 @declarative_mixin
 class AddressMixin:
-    country: Mapped[str] = mapped_column(db.String(50), nullable=False)
-    city: Mapped[str] = mapped_column(db.String(50), nullable=True)
-    street: Mapped[str] = mapped_column(db.String(100), nullable=False)
+    country: Mapped[str] = mapped_column(db.String(2), nullable=False)  # ISO code A-2
+    district: Mapped[str] = mapped_column(db.String(50), nullable=True)
+    city: Mapped[str] = mapped_column(db.String(50), nullable=False)
+    neighborhood: Mapped[str] = mapped_column(db.String(50), nullable=True)
+    street: Mapped[str] = mapped_column(db.String(50), nullable=False)
+    street_number: Mapped[str] = mapped_column(db.String(15), nullable=False)
+    block_number: Mapped[str] = mapped_column(db.String(15), nullable=True)
+    apartment: Mapped[str] = mapped_column(db.String(15), nullable=True)
+    floor: Mapped[str] = mapped_column(db.String(10), nullable=True)
+    postal_code: Mapped[str] = mapped_column(db.String(20), nullable=False)
+    latitude: Mapped[float] = mapped_column(nullable=True)
+    longitude: Mapped[float] = mapped_column(nullable=True)
