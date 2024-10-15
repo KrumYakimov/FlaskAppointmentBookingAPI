@@ -2,7 +2,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from db import db
 from models.emums import ProviderRegistrationState
-from utils.mixins import PersonalInfoMixin, AddressMixin
+from utils.mixins import PersonalInfoMixin
 
 
 class InquiryModel(db.Model, PersonalInfoMixin):
@@ -14,6 +14,6 @@ class InquiryModel(db.Model, PersonalInfoMixin):
     status: Mapped[ProviderRegistrationState] = mapped_column(
         db.Enum(ProviderRegistrationState),
         nullable=False,
-        default=ProviderRegistrationState.PENDING
+        default=ProviderRegistrationState.PENDING.name
     )
 
