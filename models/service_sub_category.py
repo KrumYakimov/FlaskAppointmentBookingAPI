@@ -20,8 +20,8 @@ class ServiceSubcategoryModel(db.Model):
         nullable=False
     )
 
-    # Relationship back to category
-    category = relationship(
+    # Relationship back to ServiceCategoryModel
+    service_category = relationship(
         "ServiceCategoryModel",
         back_populates="service_subcategories",
         lazy="select"

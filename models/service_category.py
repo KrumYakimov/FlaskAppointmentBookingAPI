@@ -9,8 +9,8 @@ class ServiceCategoryModel(db.Model):
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
     name: Mapped[str] = mapped_column(db.String(100), nullable=False, unique=True)
 
-    # Relationship to subcategories
-    subcategories = relationship(
+    # Relationship to ServiceSubcategoriesModel
+    service_subcategories = relationship(
         "ServiceSubcategoryModel",
         back_populates="service_category",
         lazy="select"

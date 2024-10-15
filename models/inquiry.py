@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db import db
 from models.emums import ProviderRegistrationState
@@ -15,5 +15,12 @@ class InquiryModel(db.Model, PersonalInfoMixin):
         db.Enum(ProviderRegistrationState),
         nullable=False,
         default=ProviderRegistrationState.PENDING.name
+    )
+
+    # Relationship to ServiceProviderModel
+    service_provider = relationship(
+        "ServiceProviderModel",
+        back_populates="inquiry",
+        lazy="select"
     )
 
