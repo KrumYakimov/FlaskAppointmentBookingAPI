@@ -1,6 +1,3 @@
-from datetime import datetime
-
-from sqlalchemy import func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db import db
@@ -13,5 +10,10 @@ class UserModel(db.Model, PersonalInfoMixin, TimestampMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     password: Mapped[str] = mapped_column(db.String(255), nullable=False)
+    role: Mapped[RoleType] = mapped_column(
+        db.Enum(RoleType),
+        default=RoleType.CLIENT.name,
+        nullable=False
+    )
 
 
