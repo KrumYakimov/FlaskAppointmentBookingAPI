@@ -4,7 +4,7 @@ import enum
 class RoleType(enum.Enum):
     ADMIN = "admin"
     APPROVER = "approver"
-    CLIENT = " "
+    CLIENT = "client "
     OWNER = "company_representative"
     STAFF = "staff"
 
