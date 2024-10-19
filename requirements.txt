@@ -16,6 +16,7 @@ MarkupSafe==2.1.5
 marshmallow==3.22.0
 marshmallow-enum==1.5.1
 packaging==24.1
+password-strength==0.0.3.post2
 psycopg2-binary==2.9.9
 PyJWT==2.9.0
 python-decouple==3.8

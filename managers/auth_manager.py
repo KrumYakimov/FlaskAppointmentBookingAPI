@@ -1,6 +1,6 @@
+import logging
 from datetime import datetime, timedelta
 
-import logging
 import jwt
 from decouple import config
 from flask_httpauth import HTTPTokenAuth
@@ -28,10 +28,11 @@ class AuthManager:
         payload = {
             "sub": user.id,
             "exp": datetime.utcnow() + timedelta(hours=int(config("TOKEN_EXPIRATION_HOURS"))),
+            "iat": datetime.utcnow(),
+            "nbf": datetime.utcnow(),
             "role": user.role if isinstance(user.role, str) else user.role.name
         }
-        token = jwt.encode(payload, key=config("SECRET_KEY"), algorithm="HS256")
-        return token
+        return jwt.encode(payload, key=config("SECRET_KEY"), algorithm="HS256")
 
     @staticmethod
     def decode_token(token: str) -> dict:
@@ -67,14 +68,15 @@ def verify_token(token: str) -> UserModel:
 
     :param token: JWT token as a string.
     :return: UserModel object if the token is valid and the user is found.
-    :raises Unauthorized: If the token is invalid or the user does not exist.
+    :raises Unauthorized: If the token is invalid, the user is inactive, or the user does not exist.
     """
     try:
         decoded_token = AuthManager.decode_token(token)
         user_id = decoded_token["id"]
         user_role = decoded_token["role"]
 
-        user = db.session.execute(db.select(UserModel).filter_by(id=user_id)).scalar()
+        # Fetch the user and ensure they are active
+        user = db.session.execute(db.select(UserModel).filter_by(id=user_id, is_active=True)).scalar()
         if user is None:
             raise Unauthorized(AuthManager.INVALID_OR_MISSING_TOKEN_MESSAGE)
 

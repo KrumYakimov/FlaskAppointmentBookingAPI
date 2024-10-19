@@ -2,7 +2,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db import db
 from models import owner_service_provider_association
-from models.emums import ProviderRegistrationState
 from utils.mixins import AddressMixin
 
 

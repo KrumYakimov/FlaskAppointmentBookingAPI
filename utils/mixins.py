@@ -37,7 +37,7 @@ class AddressMixin:
     street_number: Mapped[str] = mapped_column(db.String(15), nullable=False)
     block_number: Mapped[str] = mapped_column(db.String(15), nullable=True)
     apartment: Mapped[str] = mapped_column(db.String(15), nullable=True)
-    floor: Mapped[str] = mapped_column(db.String(10), nullable=True)
+    floor: Mapped[str] = mapped_column(db.String(255), nullable=True)
     postal_code: Mapped[str] = mapped_column(db.String(20), nullable=False)
     latitude: Mapped[float] = mapped_column(nullable=True)
     longitude: Mapped[float] = mapped_column(nullable=True)

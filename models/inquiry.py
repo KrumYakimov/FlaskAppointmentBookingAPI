@@ -2,10 +2,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db import db
 from models.emums import ProviderRegistrationState
-from utils.mixins import PersonalInfoMixin
+from utils.mixins import PersonalInfoMixin, TimestampMixin
 
 
-class InquiryModel(db.Model, PersonalInfoMixin):
+class InquiryModel(db.Model, PersonalInfoMixin, TimestampMixin):
     __tablename__ = "inquiries"
 
     id: Mapped[int] = mapped_column(primary_key=True)
