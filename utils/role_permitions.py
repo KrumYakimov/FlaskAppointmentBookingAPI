@@ -1,9 +1,9 @@
 ROLE_PERMISSIONS = {
     "ADMIN": {
-        "view": ["ADMIN", "APPROVER", "OWNER", "STAFF"],
+        "view": ["ADMIN", "APPROVER", "OWNER", "STAFF", "CLIENT"],
         "register": ["ADMIN", "APPROVER", "OWNER", "STAFF"],
         "edit": ["ADMIN", "APPROVER", "OWNER", "STAFF"],
-        "deactivate": ["ADMIN", "APPROVER", "OWNER", "STAFF"]
+        "deactivate": ["ADMIN", "APPROVER", "OWNER", "STAFF", "CLIENT"],
     },
     "APPROVER": {
         "view": ["OWNER", "STAFF"],

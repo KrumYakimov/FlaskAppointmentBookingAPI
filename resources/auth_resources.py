@@ -79,10 +79,13 @@ class UserRegistration(Resource):
 class UserProfile(Resource):
     @auth.login_required
     @role_based_access_control('view')
-    def get(self, status=None, user_number=None):
+    def get(self, status=None, user_id=None):
         current_user = auth.current_user()
         status = status or request.args.get('status', None)
-        user_number = user_number or request.args.get('user_number', None)
+        user_number = user_id or request.args.get('user_number', None)
+        print(f"Current User: {current_user}")
+        print(f"Fetching Users with Status: {status} and User Number: {user_number}")
+
         users = UserManager.get_users(current_user, status=status, user_number=user_number)
         return {"users": UserResponseSchema().dump(users, many=True)}, 200
 
@@ -102,7 +105,7 @@ class UserDeactivation(Resource):
     @role_based_access_control('deactivate')
     def put(self, user_id):
         UserManager.deactivate_user(user_id)
-        return {"message": "Account deactivated successfully."}, 200
+        return {"message":    git "Account deactivated successfully."}, 200
 
 
 

@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from db import db
 from managers.auth_manager import AuthManager, auth
-from models import UserModel, ServiceProviderModel
+from models import UserModel, ServiceProviderModel, owner_service_provider_association
 from models.emums import RoleType
 from utils.custom_validators import UniqueConstraintValidator
 
@@ -143,45 +143,135 @@ class UserManager:
             validator.rollback()
             validator.check_unique_violation(e)
 
+    # @staticmethod
+    # def get_users(current_user, status=None, user_number=None):
+    #     """
+    #     Retrieves a list of users relative to the current user's rights.
+    #     Can filter by status (active/inactive) or user number.
+    #
+    #     :param current_user: The currently authenticated user
+    #     :param status: 'active' or 'inactive' to filter users
+    #     :param user_number: A specific user ID to search for
+    #     :return: A list of users
+    #     """
+    #     stmt = db.select(UserModel)
+    #
+    #     if current_user.role == RoleType.ADMIN:
+    #         pass
+    #     elif current_user.role == RoleType.APPROVER:
+    #         stmt = stmt.where(UserModel.role.in_([RoleType.OWNER, RoleType.STAFF]))
+    #     elif current_user.role == RoleType.OWNER:
+    #         # Owners can only view staff from their own service provider
+    #         stmt = (
+    #             stmt.join(owner_service_provider_association,
+    #                       owner_service_provider_association.c.owner_id == UserModel.id)
+    #             .where(owner_service_provider_association.c.service_provider_id == current_user.service_provider_id,
+    #                    UserModel.role == RoleType.STAFF)
+    #         )
+    #     else:
+    #         raise Forbidden("You do not have permission to view users.")
+    #
+    #     if user_number:
+    #         stmt = stmt.where(UserModel.id == user_number)
+    #         result = db.session.execute(stmt)
+    #         user = result.scalar_one_or_none()
+    #         if not user:
+    #             raise NotFound(f"You do not have permission to view {user_number}.")
+    #         return [user]
+    #
+    #     if status:
+    #         if status not in ['active', 'inactive']:
+    #             raise BadRequest("Invalid status. Allowed values are 'active' or 'inactive'.")
+    #         is_active = status == 'active'
+    #         stmt = stmt.where(UserModel.is_active == is_active)
+    #
+    #     result = db.session.execute(stmt)
+    #     users = result.scalars().all()
+    #     return users
+
+    from sqlalchemy import select
+
+    # @staticmethod
+    # def get_users(current_user, status=None, user_number=None):
+    #     """
+    #     Retrieves a list of users relative to the current user's rights.
+    #     Can filter by status (active/inactive) or user number.
+    #     """
+    #     # Start with the base select query
+    #     stmt = db.select(UserModel).distinct()  # Using distinct to avoid duplicates
+    #
+    #     # Apply role-based filtering
+    #     if current_user.role == RoleType.OWNER:
+    #         stmt = (
+    #             db.select(UserModel)
+    #             .distinct()
+    #             .join(owner_service_provider_association,
+    #                   owner_service_provider_association.c.owner_id == current_user.id)
+    #             .join(ServiceProviderModel,
+    #                   owner_service_provider_association.c.service_provider_id == ServiceProviderModel.id)
+    #             .where(UserModel.role == RoleType.STAFF)
+    #             .where(UserModel.service_provider_id == owner_service_provider_association.c.service_provider_id)
+    #         )
+    #     elif current_user.role == RoleType.APPROVER:
+    #         # Use `where()` instead of `filter()` to apply conditions in the new approach
+    #         stmt = stmt.where(UserModel.role.in_([RoleType.OWNER, RoleType.STAFF]))
+    #
+    #     # Apply filters based on user_number
+    #     if user_number:
+    #         stmt = stmt.where(UserModel.id == user_number)
+    #
+    #     # Apply filters based on status
+    #     if status:
+    #         is_active = status.lower() == 'active'
+    #         stmt = stmt.where(UserModel.is_active == is_active)
+    #
+    #     # Execute the query and retrieve the results
+    #     users = db.session.execute(stmt).scalars().all()
+    #
+    #     return users
+
     @staticmethod
     def get_users(current_user, status=None, user_number=None):
         """
         Retrieves a list of users relative to the current user's rights.
         Can filter by status (active/inactive) or user number.
-
-        :param current_user: The currently authenticated user
-        :param status: 'active' or 'inactive' to filter users
-        :param user_number: A specific user ID to search for
-        :return: A list of users
         """
-        stmt = db.select(UserModel)
+        # Start with the base select query
+        stmt = db.select(UserModel).distinct()
 
-        if current_user.role == RoleType.ADMIN:
-            pass
+        if current_user.role == RoleType.OWNER:
+            # Owner-specific filtering
+            stmt = (
+                db.select(UserModel)
+                .distinct()
+                .join(owner_service_provider_association,
+                      owner_service_provider_association.c.owner_id == current_user.id)
+                .join(ServiceProviderModel,
+                      owner_service_provider_association.c.service_provider_id == ServiceProviderModel.id)
+                .where(UserModel.role == RoleType.STAFF)
+                .where(UserModel.service_provider_id == owner_service_provider_association.c.service_provider_id)
+            )
+            print(f"SQL Query for OWNER: {stmt}")
         elif current_user.role == RoleType.APPROVER:
+            # Approvers can view owners and staff
             stmt = stmt.where(UserModel.role.in_([RoleType.OWNER, RoleType.STAFF]))
-        elif current_user.role == RoleType.OWNER:
-            stmt = stmt.where(UserModel.service_provider_id == current_user.service_provider_id,
-                              UserModel.role == RoleType.STAFF)
-        else:
-            raise Forbidden("You do not have permission to view users.")
 
+        # Apply filters based on user_number
         if user_number:
             stmt = stmt.where(UserModel.id == user_number)
-            result = db.session.execute(stmt)
-            user = result.scalar_one_or_none()
-            if not user:
-                raise NotFound(f"You do not have permission to view {user_number}.")
-            return [user]
 
+        # Apply filters based on status
         if status:
-            if status not in ['active', 'inactive']:
-                raise BadRequest("Invalid status. Allowed values are 'active' or 'inactive'.")
-            is_active = status == 'active'
+            is_active = status.lower() == 'active'
             stmt = stmt.where(UserModel.is_active == is_active)
 
-        result = db.session.execute(stmt)
-        users = result.scalars().all()
+        # Debug before executing query
+        print(f"Final SQL Query: {stmt}")
+
+        # Execute the query and retrieve the results
+        users = db.session.execute(stmt).scalars().all()
+
+        print(f"Users fetched: {users}")
         return users
 
     @staticmethod
