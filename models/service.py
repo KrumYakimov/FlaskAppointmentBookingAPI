@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db import db
+from utils.mixins import TimestampMixin
 
 
-class ServiceModel(db.Model):
+class ServiceModel(db.Model, TimestampMixin):
     __tablename__ = "services"
 
     id: Mapped[int] = mapped_column(primary_key=True)

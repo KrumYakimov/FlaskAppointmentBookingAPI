@@ -1,9 +1,11 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db import db
+from utils.mixins import TimestampMixin
 
 
-class ServiceSubcategoryModel(db.Model):
+class ServiceSubcategoryModel(db.Model, TimestampMixin):
+
     __tablename__ = "subcategories"
 
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)

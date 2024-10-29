@@ -2,10 +2,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db import db
 from models import owner_service_provider_association
-from utils.mixins import AddressMixin
+from utils.mixins import AddressMixin, TimestampMixin
 
 
-class ServiceProviderModel(db.Model, AddressMixin):
+class ServiceProviderModel(db.Model, AddressMixin, TimestampMixin):
     __tablename__ = "service_providers"
 
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
