@@ -130,8 +130,8 @@ def role_based_access_control(action):
             else:
                 print(f"Current User Role: {current_user.role}, No Target User Found")
 
-            # If no target user is passed and the action requires it (register, edit), get the role from the request
-            if not target_user and action in ['register', 'edit', 'deactivate']:
+            # If no target user is passed and the action requires it (cedit), get the role from the request
+            if not target_user and action in ['create', 'edit', 'deactivate']:
                 target_role = request.json.get('role', None)
             else:
                 target_role = target_user.role.name if target_user else None

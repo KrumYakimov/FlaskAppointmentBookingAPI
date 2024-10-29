@@ -1,6 +1,5 @@
 from flask import request
 from flask_restful import Resource
-from werkzeug.exceptions import Forbidden
 
 from managers.auth_manager import auth
 from managers.user_manager import UserManager
@@ -68,7 +67,7 @@ class ClientDeactivation(Resource):
 class UserRegistration(Resource):
     @auth.login_required
     @validate_schema(UserRegistrationRequestSchema)
-    @role_based_access_control('register')
+    @role_based_access_control('create')
     def post(self):
         current_user = auth.current_user()
         user_data = request.get_json()
@@ -105,7 +104,7 @@ class UserDeactivation(Resource):
     @role_based_access_control('deactivate')
     def put(self, user_id):
         UserManager.deactivate_user(user_id)
-        return {"message":    git "Account deactivated successfully."}, 200
+        return {"message": "Account deactivated successfully."}, 200
 
 
 
