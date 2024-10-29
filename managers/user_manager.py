@@ -84,21 +84,37 @@ class UserManager:
         return client_profile
 
     @staticmethod
-    def edit_client_profile(current_user, client_data):
-        current_user.email = client_data.get("email", current_user.email)
-        current_user.first_name = client_data.get("first_name", current_user.first_name)
-        current_user.last_name = client_data.get("last_name", current_user.last_name)
-        current_user.phone = client_data.get("phone", current_user.phone)
+    def update_user_profile(user, data):
+        """
+        Updates the user attributes and handles uniqueness validation.
+
+        :param user: The user object to be updated
+        :param data: Dictionary containing updated user fields
+        :raises IntegrityError: If a unique constraint is violated
+        """
+        user.email = data.get("email", user.email)
+        user.first_name = data.get("first_name", user.first_name)
+        user.last_name = data.get("last_name", user.last_name)
+        user.phone = data.get("phone", user.phone)
 
         validator = UniqueConstraintValidator(db.session)
 
         try:
-            db.session.add(current_user)
+            db.session.add(user)
             db.session.flush()
-            return AuthManager.encode_token(current_user)
         except IntegrityError as e:
             validator.rollback()
             validator.check_unique_violation(e)
+
+    @staticmethod
+    def edit_client_profile(current_user, client_data):
+        """
+        Edits the profile of the current user (client).
+
+        :param current_user: The user object of the current client
+        :param client_data: Dictionary containing updated client fields
+        """
+        UserManager.update_user_profile(current_user, client_data)
 
     @staticmethod
     def deactivate_client(current_user):
@@ -108,7 +124,7 @@ class UserManager:
     def register_user(current_user, user_data):
         user_data["password"] = generate_password_hash(user_data['password'], method='pbkdf2:sha256')
 
-        # Create the user object without relationships (like owned_company_ids)
+
         new_user = UserModel(
             email=user_data['email'],
             password=user_data['password'],
@@ -189,7 +205,7 @@ class UserManager:
     #     users = result.scalars().all()
     #     return users
 
-    from sqlalchemy import select
+
 
     # @staticmethod
     # def get_users(current_user, status=None, user_number=None):
@@ -229,6 +245,7 @@ class UserManager:
     #     users = db.session.execute(stmt).scalars().all()
     #
     #     return users
+
 
     @staticmethod
     def get_users(current_user, status=None, user_number=None):
@@ -276,26 +293,19 @@ class UserManager:
 
     @staticmethod
     def edit_user_profile(user_data, user_id):
-        # Retrieve the user from the database using user_id
+        """
+        Edits the profile of the user with the given user_id.
+
+        :param user_data: Dictionary containing updated user fields
+        :param user_id: ID of the user to be updated
+        :raises NotFound: If the user with the given ID is not found
+        """
         user = db.session.execute(db.select(UserModel).filter_by(id=user_id)).scalar_one_or_none()
 
         if not user:
             raise NotFound(f"User with id {user_id} not found.")
 
-        user.email = user_data.get("email", user.email)
-        user.first_name = user_data.get("first_name", user.first_name)
-        user.last_name = user_data.get("last_name", user.last_name)
-        user.phone = user_data.get("phone", user.phone)
-
-        validator = UniqueConstraintValidator(db.session)
-
-        try:
-            db.session.add(user)
-            db.session.flush()
-            return AuthManager.encode_token(user)
-        except IntegrityError as e:
-            validator.rollback()
-            validator.check_unique_violation(e)
+        UserManager.update_user_profile(user, user_data)
 
     @staticmethod
     def deactivate_user(user_id):
