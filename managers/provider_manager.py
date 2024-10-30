@@ -40,7 +40,7 @@ class ProviderManager:
             db.session.flush()
         except IntegrityError:
             db.session.rollback()
-            raise Conflict("A provider with the provided data already exists.")
+            raise Conflict("A provider with the same UIC or Inquiry ID already exists.")
 
     @staticmethod
     def update_provider(provider_id, data):
