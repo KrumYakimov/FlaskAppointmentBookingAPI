@@ -19,7 +19,8 @@ class ServiceProviderModel(db.Model, AddressMixin, TimestampMixin):
     inquiry_id: Mapped[int] = mapped_column(
         db.Integer,
         db.ForeignKey("inquiries.id", name="fk_service_providers_inquiries"),
-        nullable=False,
+        nullable=True,
+        unique=True,
     )
     # Relationship to link to InquiryModel
     inquiry = relationship(
