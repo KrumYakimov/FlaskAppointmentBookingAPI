@@ -17,13 +17,12 @@ class PersonalInfoMixin:
 @declarative_mixin
 class TimestampMixin:
     created_on: Mapped[datetime] = mapped_column(
-        server_default=func.timezone('UTC', func.now()),
-        nullable=False
+        server_default=func.timezone("UTC", func.now()), nullable=False
     )
     updated_on: Mapped[datetime] = mapped_column(
-        onupdate=func.timezone('UTC', func.now()),
-        server_default=func.timezone('UTC', func.now()),
-        nullable=False
+        onupdate=func.timezone("UTC", func.now()),
+        server_default=func.timezone("UTC", func.now()),
+        nullable=False,
     )
 
 

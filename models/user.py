@@ -12,9 +12,7 @@ class UserModel(db.Model, PersonalInfoMixin, TimestampMixin):
     id: Mapped[int] = mapped_column(primary_key=True)
     password: Mapped[str] = mapped_column(db.String(255), nullable=False)
     role: Mapped[RoleType] = mapped_column(
-        db.Enum(RoleType),
-        default=RoleType.CLIENT.name,
-        nullable=False
+        db.Enum(RoleType), default=RoleType.CLIENT.name, nullable=False
     )
     is_active: Mapped[bool] = mapped_column(default=True)  # Soft delete flag
 
@@ -22,10 +20,10 @@ class UserModel(db.Model, PersonalInfoMixin, TimestampMixin):
     service_provider_id: Mapped[int] = mapped_column(
         db.Integer,
         db.ForeignKey(
-            'service_providers.id',
+            "service_providers.id",
             name="fk_users_service_provider",
         ),
-        nullable=True
+        nullable=True,
     )
 
     # Many-to-Many relationship to service providers for owners
@@ -33,7 +31,7 @@ class UserModel(db.Model, PersonalInfoMixin, TimestampMixin):
         "ServiceProviderModel",
         secondary=owner_service_provider_association,
         back_populates="owners",
-        lazy="select"
+        lazy="select",
     )
 
     # Relationship with the ServiceProviderModel
@@ -44,14 +42,9 @@ class UserModel(db.Model, PersonalInfoMixin, TimestampMixin):
     )
 
     # Relationship with the ServiceModel (if the staff handles multiple services)
-    services = relationship(
-        "ServiceModel",
-        back_populates="staff",
-        lazy="select"
-    )
+    services = relationship("ServiceModel", back_populates="staff", lazy="select")
 
     # Soft delete check for queries
     @staticmethod
     def query_active():
         return UserModel.query.filter_by(is_active=True)
-

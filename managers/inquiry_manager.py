@@ -1,5 +1,4 @@
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound, BadRequest
 
 from db import db
@@ -35,9 +34,13 @@ class InquiryManager:
 
         if status:
             status_enum = InquiryManager._validate_inquiry_status(status)
-            return db.session.execute(
-                db.select(InquiryModel).filter_by(status=status_enum)
-            ).scalars().all()
+            return (
+                db.session.execute(
+                    db.select(InquiryModel).filter_by(status=status_enum)
+                )
+                .scalars()
+                .all()
+            )
 
         return db.session.execute(db.select(InquiryModel)).scalars().all()
 
@@ -67,15 +70,18 @@ class InquiryManager:
 
     @staticmethod
     def approve_inquiry(inquiry_id):
-        return InquiryManager.update_inquiry_status(inquiry_id, ProviderRegistrationState.APPROVED)
+        return InquiryManager.update_inquiry_status(
+            inquiry_id, ProviderRegistrationState.APPROVED
+        )
 
     @staticmethod
     def reject_inquiry(inquiry_id):
-        return InquiryManager.update_inquiry_status(inquiry_id, ProviderRegistrationState.REJECTED)
+        return InquiryManager.update_inquiry_status(
+            inquiry_id, ProviderRegistrationState.REJECTED
+        )
 
     @staticmethod
     def no_show_inquiry(inquiry_id):
-        return InquiryManager.update_inquiry_status(inquiry_id, ProviderRegistrationState.NO_SHOW)
-
-
-
+        return InquiryManager.update_inquiry_status(
+            inquiry_id, ProviderRegistrationState.NO_SHOW
+        )

@@ -1,7 +1,11 @@
 from marshmallow import fields, validate, Schema, validates_schema, ValidationError
 
 from schemas.mixins_schemas import PersonalInfoSchema
-from utils.custom_validators import PasswordValidator, PersonalInfoValidator, RoleValidator
+from utils.custom_validators import (
+    PasswordValidator,
+    PersonalInfoValidator,
+    RoleValidator,
+)
 
 
 class ClientRegistrationRequestSchema(PersonalInfoSchema):
@@ -17,7 +21,9 @@ class UserRegistrationRequestSchema(PersonalInfoSchema):
         validate=PasswordValidator().validate_password,
     )
     role = fields.Str(required=True, validate=RoleValidator().validate_role)
-    service_provider_id = fields.Int(required=False)  # Make it optional, and validate based on role
+    service_provider_id = fields.Int(
+        required=False
+    )  # Make it optional, and validate based on role
     owned_company_ids = fields.List(fields.Int(), required=False)
 
     @validates_schema
@@ -68,7 +74,7 @@ class UserLoginRequestSchema(Schema):
     email = fields.Email(
         required=True,
         validate=validate.Email(error="Invalid email format."),
-        error_messages={"required": "Email is required."}
+        error_messages={"required": "Email is required."},
     )
     password = fields.Str(required=True)
 
@@ -76,8 +82,7 @@ class UserLoginRequestSchema(Schema):
 class PasswordChangeSchema(Schema):
     old_password = fields.Str(required=True)
     new_password = fields.Str(
-        required=True,
-        validate=PasswordValidator().validate_password
+        required=True, validate=PasswordValidator().validate_password
     )
 
     @validates_schema
@@ -99,6 +104,3 @@ class UserEditRequestSchema(Schema):
     def validate_at_least_one_field(self, data, **kwargs):
         if not any(data.values()):
             raise ValidationError("At least one field must be provided for editing.")
-
-
-

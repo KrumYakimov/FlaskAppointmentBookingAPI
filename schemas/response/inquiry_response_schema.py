@@ -11,4 +11,3 @@ class InquiryResponseSchema(Schema):
     phone = fields.Str(dump_only=True)
     email = fields.Email(dump_only=True)
     created_on = fields.DateTime(dump_only=True)
-

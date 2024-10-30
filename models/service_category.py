@@ -12,7 +12,5 @@ class ServiceCategoryModel(db.Model, TimestampMixin):
 
     # Relationship to ServiceSubcategoriesModel
     service_subcategories = relationship(
-        "ServiceSubcategoryModel",
-        back_populates="service_category",
-        lazy="select"
+        "ServiceSubcategoryModel", back_populates="service_category", lazy="select"
     )

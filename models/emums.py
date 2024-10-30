@@ -23,5 +23,3 @@ class ProviderRegistrationState(enum.Enum):
     PENDING = "pending"
     REJECTED = "rejected"
     NO_SHOW = "no_show"
-
-

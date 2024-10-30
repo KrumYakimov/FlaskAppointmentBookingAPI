@@ -1,8 +1,8 @@
 from sqlalchemy.exc import IntegrityError
+from werkzeug.exceptions import NotFound, Conflict, Forbidden
 
 from db import db
 from models import ServiceProviderModel, InquiryModel, ProviderRegistrationState
-from werkzeug.exceptions import NotFound, Conflict, Forbidden
 
 
 class ProviderManager:

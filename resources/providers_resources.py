@@ -1,20 +1,26 @@
-from flask_restful import Resource
 from flask import request
+from flask_restful import Resource
 
 from managers.auth_manager import auth
 from managers.provider_manager import ProviderManager
 from models import RoleType
-from schemas.request.provider_request_schema import ProviderRegistrationRequestSchema, ProviderEditRequestSchema
+from schemas.request.provider_request_schema import (
+    ProviderRegistrationRequestSchema,
+    ProviderEditRequestSchema,
+)
 from schemas.response.provider_response_schema import ProviderResponseSchema
-from utils.decorators import role_based_access_control, permission_required, validate_schema
+from utils.decorators import (
+    permission_required,
+    validate_schema,
+)
 
 
 class ProviderProfile(Resource):
     @auth.login_required
     @permission_required(RoleType.APPROVER)
     def get(self, status=None, provider_id=None):
-        status = status or request.args.get('status', None)
-        provider_number = provider_id or request.args.get('provider_number', None)
+        status = status or request.args.get("status", None)
+        provider_number = provider_id or request.args.get("provider_number", None)
         providers = ProviderManager.get_provider(status=status, provider_id=provider_id)
         return {"providers": ProviderResponseSchema().dump(providers, many=True)}, 200
 

@@ -1,4 +1,4 @@
-from marshmallow import fields, validate, Schema
+from marshmallow import fields, Schema
 
 from utils.custom_validators import PersonalInfoValidator, AddressFieldValidator
 
@@ -28,4 +28,3 @@ class AddressSchema(Schema):
     postal_code = AddressFieldValidator.postal_code()
     latitude = AddressFieldValidator.latitude()
     longitude = AddressFieldValidator.longitude()
-

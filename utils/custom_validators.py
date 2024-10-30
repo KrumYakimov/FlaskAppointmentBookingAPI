@@ -55,17 +55,13 @@ class UniqueConstraintValidator:
     def check_unique_violation(
         error, email_key="inquiries_email_key", phone_key="inquiries_phone_key"
     ):
-        """Checks if the IntegrityError is due to a UniqueViolation and raises a generic Conflict error."""
         if isinstance(error.orig, UniqueViolation):
-            # Log the specific error for internal use but give the user a generic message
             raise Conflict(
                 "The provided information doesn't meet our data management policy. Please verify and try again."
             )
-        # General fallback error message
         raise Conflict("An issue occurred during registration. Please try again later.")
 
     def rollback(self):
-        """Rolls back the session in case of failure."""
         self.session.rollback()
 
 

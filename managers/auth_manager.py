@@ -27,10 +27,11 @@ class AuthManager:
         """
         payload = {
             "sub": user.id,
-            "exp": datetime.utcnow() + timedelta(hours=int(config("TOKEN_EXPIRATION_HOURS"))),
+            "exp": datetime.utcnow()
+            + timedelta(hours=int(config("TOKEN_EXPIRATION_HOURS"))),
             "iat": datetime.utcnow(),
             "nbf": datetime.utcnow(),
-            "role": user.role if isinstance(user.role, str) else user.role.name
+            "role": user.role if isinstance(user.role, str) else user.role.name,
         }
         return jwt.encode(payload, key=config("SECRET_KEY"), algorithm="HS256")
 
@@ -76,7 +77,9 @@ def verify_token(token: str) -> UserModel:
         user_role = decoded_token["role"]
 
         # Fetch the user and ensure they are active
-        user = db.session.execute(db.select(UserModel).filter_by(id=user_id, is_active=True)).scalar()
+        user = db.session.execute(
+            db.select(UserModel).filter_by(id=user_id, is_active=True)
+        ).scalar()
         if user is None:
             raise Unauthorized(AuthManager.INVALID_OR_MISSING_TOKEN_MESSAGE)
 

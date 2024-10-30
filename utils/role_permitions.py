@@ -9,13 +9,13 @@ ROLE_PERMISSIONS = {
         "view": ["OWNER", "STAFF"],
         "create": ["OWNER", "STAFF"],
         "edit": ["OWNER", "STAFF"],
-        "deactivate": ["OWNER", "STAFF"]
+        "deactivate": ["OWNER", "STAFF"],
     },
     "OWNER": {
         "view": ["STAFF"],
         "create": ["STAFF"],
         "edit": ["STAFF"],
-        "deactivate": ["STAFF"]
+        "deactivate": ["STAFF"],
     },
     "STAFF": {
         # Empty - staff cannot perform actions on other users

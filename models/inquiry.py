@@ -14,13 +14,10 @@ class InquiryModel(db.Model, PersonalInfoMixin, TimestampMixin):
     status: Mapped[ProviderRegistrationState] = mapped_column(
         db.Enum(ProviderRegistrationState),
         nullable=False,
-        default=ProviderRegistrationState.PENDING.name
+        default=ProviderRegistrationState.PENDING.name,
     )
 
     # Relationship to ServiceProviderModel
     service_provider = relationship(
-        "ServiceProviderModel",
-        back_populates="inquiry",
-        lazy="select"
+        "ServiceProviderModel", back_populates="inquiry", lazy="select"
     )
-

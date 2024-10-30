@@ -25,7 +25,10 @@ class InquiryRegistration(Resource):
         try:
             data = request.get_json()
             inquiry_id = InquiryManager.register_inquiry(data)
-            return {"message": "Inquiry registered successfully", "inquiry_id": inquiry_id}, 201
+            return {
+                "message": "Inquiry registered successfully",
+                "inquiry_id": inquiry_id,
+            }, 201
         except BadRequest as e:
             return {"error": str(e)}, 400
 
@@ -52,4 +55,3 @@ class InquiryNoShowStatus(Resource):
     def put(self, inquiry_id):
         InquiryManager.no_show_inquiry(inquiry_id)
         return {"message": "Inquiry no showed successfully"}, 200
-

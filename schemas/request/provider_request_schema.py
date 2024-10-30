@@ -1,7 +1,6 @@
-from marshmallow import Schema, fields, validate, validates_schema, ValidationError
+from marshmallow import fields, validate, validates_schema, ValidationError
 
 from schemas.mixins_schemas import AddressSchema
-from utils.custom_validators import AddressFieldValidator
 from utils.decorators import make_optional
 
 

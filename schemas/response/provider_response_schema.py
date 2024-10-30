@@ -15,4 +15,3 @@ class ProviderResponseSchema(Schema):
 
     # TODO: to extend the fields
     # services = fields.List(fields.Nested("ServiceResponseSchema"), dump_only=True)
-
