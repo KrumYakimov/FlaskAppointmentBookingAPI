@@ -14,4 +14,5 @@ class UserResponseSchema(ClientResponseSchema):
     role = fields.Str(dump_only=True)
     service_provider_id = fields.Int(dump_only=True)
     is_active = fields.Str(dump_only=True)
+    password = fields.Str(load_only=True)
 

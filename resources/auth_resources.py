@@ -4,10 +4,22 @@ from flask_restful import Resource
 from managers.auth_manager import auth
 from managers.user_manager import UserManager
 from models import RoleType
-from schemas.request.user_request_schemas import ClientRegistrationRequestSchema, UserLoginRequestSchema, \
-    PasswordChangeSchema, UserEditRequestSchema, UserRegistrationRequestSchema
-from schemas.response.user_response_schemas import ClientResponseSchema, UserResponseSchema
-from utils.decorators import validate_schema, permission_required, role_based_access_control
+from schemas.request.user_request_schemas import (
+    ClientRegistrationRequestSchema,
+    UserLoginRequestSchema,
+    PasswordChangeSchema,
+    UserEditRequestSchema,
+    UserRegistrationRequestSchema,
+)
+from schemas.response.user_response_schemas import (
+    ClientResponseSchema,
+    UserResponseSchema,
+)
+from utils.decorators import (
+    validate_schema,
+    permission_required,
+    role_based_access_control,
+)
 
 
 class ClientRegistration(Resource):
@@ -67,32 +79,33 @@ class ClientDeactivation(Resource):
 class UserRegistration(Resource):
     @auth.login_required
     @validate_schema(UserRegistrationRequestSchema)
-    @role_based_access_control('create')
+    @role_based_access_control("create")
     def post(self):
         current_user = auth.current_user()
         user_data = request.get_json()
         role = UserManager.register_user(current_user, user_data)
-        return {"message": f"A user with the role of {role} has been registered successfully."}, 201
+        return {
+            "message": f"A user with the role of {role} has been registered successfully."
+        }, 201
 
 
 class UserProfile(Resource):
     @auth.login_required
-    @role_based_access_control('view')
+    @role_based_access_control("view")
     def get(self, status=None, user_id=None):
         current_user = auth.current_user()
-        status = status or request.args.get('status', None)
-        user_number = user_id or request.args.get('user_number', None)
-        print(f"Current User: {current_user}")
-        print(f"Fetching Users with Status: {status} and User Number: {user_number}")
-
-        users = UserManager.get_users(current_user, status=status, user_number=user_number)
+        status = status or request.args.get("status", None)
+        user_number = user_id or request.args.get("user_number", None)
+        users = UserManager.get_users(
+            current_user, status=status, user_number=user_number
+        )
         return {"users": UserResponseSchema().dump(users, many=True)}, 200
 
 
 class UserEditing(Resource):
     @auth.login_required
     @validate_schema(UserEditRequestSchema)
-    @role_based_access_control('edit')
+    @role_based_access_control("edit")
     def put(self, user_id):
         data = request.get_json()
         UserManager.edit_user_profile(data, user_id)
@@ -101,12 +114,7 @@ class UserEditing(Resource):
 
 class UserDeactivation(Resource):
     @auth.login_required
-    @role_based_access_control('deactivate')
+    @role_based_access_control("deactivate")
     def put(self, user_id):
         UserManager.deactivate_user(user_id)
         return {"message": "Account deactivated successfully."}, 200
-
-
-
-
-
