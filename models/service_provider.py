@@ -43,3 +43,7 @@ class ServiceProviderModel(db.Model, AddressMixin, TimestampMixin):
         secondary=owner_service_provider_association,
         back_populates="owned_companies",
     )
+    # Relationship with WorkingHoursModel
+    working_hours = relationship(
+        "WorkingHoursModel", back_populates="provider", lazy="select"
+    )

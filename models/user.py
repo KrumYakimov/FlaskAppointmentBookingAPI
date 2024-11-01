@@ -44,6 +44,9 @@ class UserModel(db.Model, PersonalInfoMixin, TimestampMixin):
     # Relationship with the ServiceModel (if the staff handles multiple services)
     services = relationship("ServiceModel", back_populates="staff", lazy="select")
 
+    # Relationship with the WorkingHoursModel
+    working_hours = relationship("WorkingHoursModel", back_populates="employee", lazy="select")
+
     # Soft delete check for queries
     @staticmethod
     def query_active():

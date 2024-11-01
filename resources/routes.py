@@ -41,6 +41,8 @@ from resources.subcategories_resources import (
     SubCategoryEditing,
     SubCategoryDeactivate,
 )
+from resources.working_hours_resources import WorkingHourProfile, WorkingHourRegistration, WorkingHourEditing, \
+    WorkingHourDeactivate
 
 routes = (
     # UserManagement API #
@@ -215,4 +217,27 @@ routes = (
         SubCategoryDeactivate,
         "/subcategories/<int:subcategory_id>/deactivate",
     ),
+
+    # WorkingHourManagement API
+    (
+        # POST to register a service subcategory by the approver
+        WorkingHourProfile,
+        "/working_hours/profile",
+        "/working_hours/profile/provider/<int:provider_id>",
+        "/working_hours/profile/employee/<int:employee_id>",
+    ),
+    (
+        # POST to register working our for provider and staff
+        WorkingHourRegistration,
+        "/working_hours/register",
+    ),
+    (
+        WorkingHourEditing,
+        "/working_hours/<int:working_hours_id>/edit",
+    ),
+    (
+        WorkingHourDeactivate,
+        "/working_hours/<int:working_hours_id>/deactivate",
+    ),
+
 )
