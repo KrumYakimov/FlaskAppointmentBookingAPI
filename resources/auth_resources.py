@@ -37,6 +37,8 @@ class Login(Resource):
         token = UserManager.login(data)
         return {"token": token}
 
+# TODO: POST for user logout (Logout, "logout/")
+
 
 class ChangePassword(Resource):
     @auth.login_required

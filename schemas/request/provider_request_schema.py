@@ -30,7 +30,11 @@ class ProviderRegistrationRequestSchema(AddressSchema):
     )
 
     inquiry_id = fields.Int(
-        required=True, error_messages={"invalid": "Inquiry ID must be an integer."}
+        required=True,
+        error_messages={
+            "required": "Inquiry ID is required.",
+            "invalid": "Inquiry ID must be an integer."
+        }
     )
 
 

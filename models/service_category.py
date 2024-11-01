@@ -9,6 +9,7 @@ class ServiceCategoryModel(db.Model, TimestampMixin):
 
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
     name: Mapped[str] = mapped_column(db.String(100), nullable=False, unique=True)
+    is_active: Mapped[bool] = mapped_column(default=True)  # Soft delete flag
 
     # Relationship to ServiceSubcategoriesModel
     service_subcategories = relationship(

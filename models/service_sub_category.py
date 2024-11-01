@@ -10,6 +10,7 @@ class ServiceSubcategoryModel(db.Model, TimestampMixin):
 
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
     name: Mapped[str] = mapped_column(db.String(100), nullable=False, unique=True)
+    is_active: Mapped[bool] = mapped_column(default=True)
 
     # Foreign key to link the subcategory to a category
     category_id: Mapped[int] = mapped_column(

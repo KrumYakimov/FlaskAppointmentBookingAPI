@@ -115,10 +115,11 @@ class PersonalInfoValidator:
         return fields.Str(
             required=required,
             validate=validate.Regexp(
-                r"^\d{10,15}$", error="Phone number must contain 10 to 15 digits."
+                r"^0\d{9,14}$",
+                error="Phone number must start with 0 and contain exactly 10 to 15 digits."
             ),
             error_messages={
-                "required": "Phone number is required." if required else None
+                "required": "Phone number is required."
             },
         )
 

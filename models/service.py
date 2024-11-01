@@ -9,7 +9,9 @@ class ServiceModel(db.Model, TimestampMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(db.String(50), nullable=False)
+    duration: Mapped[int] = mapped_column(db.Integer, nullable=False)
     price: Mapped[float] = mapped_column(db.Numeric(10, 2), nullable=False)
+    is_active: Mapped[bool] = mapped_column(default=True)
 
     # Foreign key linking to the service subcategory
     service_subcategory_id: Mapped[int] = mapped_column(

@@ -21,7 +21,7 @@ class ProviderProfile(Resource):
     def get(self, status=None, provider_id=None):
         status = status or request.args.get("status", None)
         provider_number = provider_id or request.args.get("provider_number", None)
-        providers = ProviderManager.get_provider(status=status, provider_id=provider_id)
+        providers = ProviderManager.get_records(status=status, record_id=provider_id)
         return {"providers": ProviderResponseSchema().dump(providers, many=True)}, 200
 
 
@@ -41,7 +41,7 @@ class ProviderEditing(Resource):
     @permission_required(RoleType.APPROVER)
     def put(self, provider_id):
         data = request.get_json()
-        ProviderManager.update_provider(provider_id, data)
+        ProviderManager.update(provider_id, data)
         return {"message": "Service Provider updated successfully"}, 200
 
 

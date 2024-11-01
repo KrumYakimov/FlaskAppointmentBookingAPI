@@ -5,6 +5,7 @@ from schemas.response.user_response_schemas import UserResponseSchema
 
 class ProviderResponseSchema(Schema):
     id = fields.Int(dump_only=True)
+    is_active = fields.Str(dump_only=True)
     company_name = fields.Str(dump_only=True)
     trade_name = fields.Str(dump_only=True)
     uic = fields.Str(dump_only=True)
@@ -13,5 +14,5 @@ class ProviderResponseSchema(Schema):
     employees = fields.List(fields.Nested(UserResponseSchema), dump_only=True)
     owners = fields.List(fields.Nested(UserResponseSchema), dump_only=True)
 
-    # TODO: to extend the fields
+    # TODO: Extend the fields.
     # services = fields.List(fields.Nested("ServiceResponseSchema"), dump_only=True)

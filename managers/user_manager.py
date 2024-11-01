@@ -144,7 +144,7 @@ class UserManager:
         validator = UniqueConstraintValidator(db.session)
 
         try:
-            if new_user.role == RoleType.STAFF:
+            if new_user.role == RoleType.STAFF.name:
                 service_provider = db.session.execute(
                     db.select(ServiceProviderModel).filter_by(
                         id=user_data["service_provider_id"]

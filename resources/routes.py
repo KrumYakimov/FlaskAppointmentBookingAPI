@@ -10,6 +10,12 @@ from resources.auth_resources import (
     UserEditing,
     UserProfile,
 )
+from resources.categories_resources import (
+    CategoryRegistration,
+    CategoryProfile,
+    CategoryEditing,
+    CategoryDeactivate,
+)
 from resources.inquiry_resources import (
     InquiryRegistration,
     InquiryApproval,
@@ -23,63 +29,190 @@ from resources.providers_resources import (
     ProviderProfile,
     ProviderDeactivate,
 )
+from resources.services_resources import (
+    ServiceRegistration,
+    ServiceProfile,
+    ServiceEditing,
+    ServiceDeactivate,
+)
+from resources.subcategories_resources import (
+    SubCategoryRegistration,
+    SubCategoryProfile,
+    SubCategoryEditing,
+    SubCategoryDeactivate,
+)
 
 routes = (
     # UserManagement API #
-    (ClientRegistration, "/clients"),  # POST to register a client
-    (Login, "/login"),  # POST for user login
-    (ChangePassword, "/change-password"),  # POST to change password
-    (ClientProfile, "/clients/profile"),  # GET to view client profile
-    (ClientEditing, "/clients/profile/edit"),  # PUT to edit client profile
-    (ClientDeactivation, "/clients/profile/deactivate"),  # PUT to deactivate client
-    (UserRegistration, "/users"),  # POST to register users
     (
+        # POST to register a client
+        ClientRegistration,
+        "/clients",
+    ),
+    (
+        # POST for user login
+        Login,
+        "/login",
+    ),
+    (
+        # POST to change password
+        ChangePassword,
+        "/change-password",
+    ),
+    (
+        # GET to view client profile
+        ClientProfile,
+        "/clients/profile",
+    ),
+    (
+        # PUT to edit client profile
+        ClientEditing,
+        "/clients/profile/edit",
+    ),
+    (
+        # PUT to deactivate client
+        ClientDeactivation,
+        "/clients/profile/deactivate",
+    ),
+    (
+        # POST to register users
+        UserRegistration,
+        "/users",
+    ),
+    (
+        # GET to view client profile
         UserProfile,
         "/users/profile",
         "/users/profile/<string:status>",
         "/users/profile/<int:user_id>",
-    ),  # GET to view client profile
-    (UserEditing, "/users/<int:user_id>/edit/"),  # PUT to edit client profile
+    ),
     (
+        # PUT to edit client profile
+        UserEditing,
+        "/users/<int:user_id>/edit/",
+    ),
+    (
+        # PUT to deactivate a user by admin
         UserDeactivation,
         "/users/<int:user_id>/deactivate",
-    ),  # PUT to deactivate a user by admin
+    ),
     # InquiryManagement API
-    (InquiryRegistration, "/inquiries"),  # POST to register an inquiry
     (
+        # POST to register an inquiry
+        InquiryRegistration,
+        "/inquiries",
+    ),
+    (
+        # GET for inquiries with optional status
         Inquiries,
         "/approver/inquiries",
         "/approver/inquiries/<string:status>",
-    ),  # GET for inquiries with optional status
+    ),
     (
+        # PUT to approve an inquiry
         InquiryApproval,
         "/approver/inquiries/<int:inquiry_id>/approval",
-    ),  # PUT to approve an inquiry
+    ),
     (
+        # PUT to reject an inquiry
         InquiryRejection,
         "/approver/inquiries/<int:inquiry_id>/rejection",
-    ),  # PUT to reject an inquiry
+    ),
     (
+        # PUT to mark an inquiry as no-show
         InquiryNoShowStatus,
         "/approver/inquiries/<int:inquiry_id>/no-show",
-    ),  # PUT to mark an inquiry as no-show
+    ),
     # ServiceProviderManagement API
     (
+        # POST to register a service provider by the approver
         ProviderRegistration,
         "/provider",
-    ),  # POST to register a service provider by approver
+    ),
     (
+        # GET to view provider profile by the approver
         ProviderProfile,
         "/providers/profile",
         "/providers/profile/<string:status>",
         "/providers/profile/<int:provider_id>",
-    ),  # GET to view provider profile by approver
+    ),
     (
+        # PUT to edit provider profile by the approver
         ProviderEditing,
         "/provider/<int:provider_id>/edit/",
-    ),  # PUT to edit provider profile by approver
+    ),
     (
+        # PUT to deactivate a provider by the approver
         ProviderDeactivate,
         "/provider/<int:provider_id>/deactivate",
-    ),  # PUT to deactivate a provider by approver
+    ),
+    # ServiceManagement API
+    (
+        # POST to register a service by the approver
+        ServiceRegistration,
+        "/services",
+    ),
+    (
+        # GET to view services by the approver
+        ServiceProfile,
+        "/services/profile",
+        "/services/profile/<string:status>",
+        "/services/profile/<int:service_id>",
+    ),
+    (
+        # PUT to edit a service profile by the approver
+        ServiceEditing,
+        "/services/<int:service_id>/edit",
+    ),
+    (
+        # PUT to deactivate a service by the approver
+        ServiceDeactivate,
+        "/services/<int:service_id>/deactivate",
+    ),
+    # ServiceCategoryManagement API
+    (
+        # POST to register a service category by the approver
+        CategoryRegistration,
+        "/categories",
+    ),
+    (
+        # GET to view service categories by the approver
+        CategoryProfile,
+        "/categories/profile",
+        "/categories/profile/<string:status>",
+        "/categories/profile/<int:category_id>",
+    ),
+    (
+        # PUT to edit a service category profile by the approver
+        CategoryEditing,
+        "/categories/<int:category_id>/edit",
+    ),
+    (
+        # PUT to deactivate a service category by the approver
+        CategoryDeactivate,
+        "/categories/<int:category_id>/deactivate",
+    ),
+    # ServiceSubCategoryManagement API
+    (
+        # POST to register a service subcategory by the approver
+        SubCategoryRegistration,
+        "/subcategories",
+    ),
+    (
+        # GET to view service subcategories by the approver
+        SubCategoryProfile,
+        "/subcategories/profile",
+        "/subcategories/profile/<string:status>",
+        "/subcategories/profile/<int:subcategory_id>",
+    ),
+    (
+        # PUT to edit a service subcategory by the approver
+        SubCategoryEditing,
+        "/subcategories/<int:subcategory_id>/edit",
+    ),
+    (
+        # PUT to deactivate a service subcategory by the approver
+        SubCategoryDeactivate,
+        "/subcategories/<int:subcategory_id>/deactivate",
+    ),
 )
