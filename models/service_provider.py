@@ -12,6 +12,7 @@ class ServiceProviderModel(db.Model, AddressMixin, TimestampMixin):
     company_name: Mapped[str] = mapped_column(db.String(100), nullable=False)
     trade_name: Mapped[str] = mapped_column(db.String(100), nullable=False)
     uic: Mapped[str] = mapped_column(db.String(20), unique=True, nullable=False)
+    photo_url: Mapped[str] = mapped_column(db.String(255), nullable=False)
 
     is_active: Mapped[bool] = mapped_column(default=True)  # Soft delete flag
 

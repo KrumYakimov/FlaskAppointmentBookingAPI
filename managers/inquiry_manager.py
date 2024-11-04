@@ -1,5 +1,5 @@
 from sqlalchemy.exc import IntegrityError
-from werkzeug.exceptions import NotFound, BadRequest
+from werkzeug.exceptions import NotFound, BadRequest, Forbidden
 
 from db import db
 from models import InquiryModel, ProviderRegistrationState
@@ -63,6 +63,19 @@ class InquiryManager:
 
         if inquiry is None:
             raise NotFound(f"Inquiry with id {inquiry_id} does not exist")
+
+        allowed_transitions = {
+            ProviderRegistrationState.PENDING: {
+                ProviderRegistrationState.APPROVED,
+                ProviderRegistrationState.REJECTED
+            },
+            ProviderRegistrationState.APPROVED: {
+                ProviderRegistrationState.NO_SHOW
+            },
+        }
+
+        if new_status not in allowed_transitions.get(inquiry.status, {}):
+            raise Forbidden("You do not have permissions to change the status of the inquiry")
 
         inquiry.status = new_status
         db.session.add(inquiry)

@@ -1,9 +1,18 @@
+import os
+import uuid
 
+from constants import TEMP_FILE_FOLDER
 from db import db
 from managers.base_manager import BaseManager
 from models import ServiceProviderModel, InquiryModel, ProviderRegistrationState
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound, Conflict, Forbidden
+
+from services import s3
+from services.s3 import S3Service
+from utils.helpers import decode_photo
+
+s3 = S3Service()
 
 
 class ProviderManager(BaseManager):
@@ -17,6 +26,13 @@ class ProviderManager(BaseManager):
     def create_provider(cls, data):
         inquiry_id = data.get("inquiry_id")
         inquiry = cls._get_inquiry(inquiry_id)
+        encoded_photo = data.pop("photo")
+        extension = data.pop("photo_extension")
+        name = f"{str(uuid.uuid4())}.{extension}"
+        path = os.path.join(TEMP_FILE_FOLDER, f"{name}")
+        decode_photo(path, encoded_photo)
+        url = s3.upload_photo(path, name, extension)
+        data["photo_url"] = url
 
         if inquiry.status != ProviderRegistrationState.APPROVED:
             raise Forbidden("Inquiry must be approved before registering a provider.")

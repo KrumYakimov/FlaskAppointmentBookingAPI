@@ -9,12 +9,12 @@ class WorkingHoursManager(BaseManager):
     model = WorkingHoursModel
 
     @classmethod
-    def get_working_hours(cls, provider_id=None, employee_id=None):
+    def get_working_hours(cls, provider_id=None, staff_id=None):
         query = db.select(cls.model)
         if provider_id:
             query = query.where(cls.model.provider_id == provider_id)
-        elif employee_id:
-            query = query.where(cls.model.employee_id == employee_id)
+        elif staff_id:
+            query = query.where(cls.model.employee_id == staff_id)
 
         return db.session.execute(query).scalars().all()
 

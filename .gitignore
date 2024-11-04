@@ -163,3 +163,5 @@ cython_debug/
 
 # hidden system file created by macOS
 .DS_Store
+
+temp_files/

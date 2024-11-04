@@ -1,3 +1,10 @@
+from resources.appointment_resourses import (
+    CustomerAppointmentBooking,
+    CustomerAppointmentEditing,
+    CustomerAppointmentCancellation,
+    CustomerAppointments, AvailableSlots, StaffAppointmentConfirmation, StaffAppointmentRejection,
+    StaffAppointmentNoShow, StaffAppointmentCancellation, StaffAppointmentCompletion,
+)
 from resources.auth_resources import (
     ClientRegistration,
     Login,
@@ -41,8 +48,12 @@ from resources.subcategories_resources import (
     SubCategoryEditing,
     SubCategoryDeactivate,
 )
-from resources.working_hours_resources import WorkingHourProfile, WorkingHourRegistration, WorkingHourEditing, \
-    WorkingHourDeactivate
+from resources.working_hours_resources import (
+    WorkingHourProfile,
+    WorkingHourRegistration,
+    WorkingHourEditing,
+    WorkingHourDeactivate,
+)
 
 routes = (
     # UserManagement API #
@@ -217,7 +228,6 @@ routes = (
         SubCategoryDeactivate,
         "/subcategories/<int:subcategory_id>/deactivate",
     ),
-
     # WorkingHourManagement API
     (
         # POST to register a service subcategory by the approver
@@ -232,12 +242,57 @@ routes = (
         "/working_hours/register",
     ),
     (
+        # PUT to edit a working hours
         WorkingHourEditing,
         "/working_hours/<int:working_hours_id>/edit",
     ),
     (
+        # PUT to deactivate a working hours
         WorkingHourDeactivate,
         "/working_hours/<int:working_hours_id>/deactivate",
     ),
+    # AppointmentManagement API
+    (
+        AvailableSlots,
+        "/appointments/available_slots/<int:staff_id>/<int:service_id>/<string:date>"
+    ),
+    (
+        CustomerAppointmentBooking,
+        "/appointments"
+    ),
+    (
+        CustomerAppointments,
+        "/appointments/info"
+    ),
+    (
+        CustomerAppointmentEditing,
+        "/appointments/<int:appointment_id>/edit"
+    ),
+    (
+        CustomerAppointmentCancellation,
+        "/appointments/<int:appointment_id>/cancel"
+    ),
+    (
+        StaffAppointmentConfirmation,
+        "/appointments/<int:appointment_id>/confirm"
+    ),
 
+    (
+        StaffAppointmentRejection,
+        "/appointments/<int:appointment_id>/reject"
+    ),
+
+    (
+        StaffAppointmentNoShow,
+        "/appointments/<int:appointment_id>/no_show"
+    ),
+
+    (
+        StaffAppointmentCancellation,
+        "/appointments/<int:appointment_id>/cancel"
+    ),
+    (
+        StaffAppointmentCompletion,
+        "/appointments/<int:appointment_id>/complete"
+    ),
 )

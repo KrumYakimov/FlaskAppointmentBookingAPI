@@ -44,3 +44,6 @@ class ServiceModel(db.Model, TimestampMixin):
 
     # Relationship with UserModel (staff member responsible for the service)
     staff = relationship("UserModel", back_populates="services", lazy="select")
+
+    # Relationship with AppointmentModel
+    appointments = relationship("AppointmentModel", back_populates="service")

@@ -29,6 +29,9 @@ class ProviderRegistrationRequestSchema(AddressSchema):
         error_messages={"required": "UIC is required."},
     )
 
+    photo = fields.String(required=True)
+    photo_extension = fields.String(required=True)
+
     inquiry_id = fields.Int(
         required=True,
         error_messages={
@@ -39,7 +42,19 @@ class ProviderRegistrationRequestSchema(AddressSchema):
 
 
 @make_optional
-class ProviderEditRequestSchema(ProviderRegistrationRequestSchema):
+class ProviderEditRequestSchema(AddressSchema):
+    company_name = fields.Str(
+        required=False,
+        validate=validate.Length(min=2, max=100),
+        error_messages={"required": "Company name is required."},
+    )
+
+    trade_name = fields.Str(
+        required=False,
+        validate=validate.Length(min=2, max=100),
+        error_messages={"required": "Trade name is required."},
+    )
+
     @validates_schema
     def validate_at_least_one_field(self, data, **kwargs):
         if not any(data.values()):

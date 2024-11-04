@@ -23,3 +23,17 @@ class ProviderRegistrationState(enum.Enum):
     PENDING = "pending"
     REJECTED = "rejected"
     NO_SHOW = "no_show"
+
+
+# class PaymentMethod(enum.Enum):
+#     CASH = "cash"
+#     DEBIT_CARD = "debit_card"
+#     CREDIT_CARD = "credit_card"
+#
+#
+# class PaymentStatus(enum.Enum):
+#     PENDING = "pending"
+#     HELD = "held"
+#     COMPLETED = "completed"
+#     CANCELED = "canceled"
+

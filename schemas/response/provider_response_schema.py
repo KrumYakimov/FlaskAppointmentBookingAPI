@@ -9,6 +9,7 @@ class ProviderResponseSchema(Schema):
     company_name = fields.Str(dump_only=True)
     trade_name = fields.Str(dump_only=True)
     uic = fields.Str(dump_only=True)
+    photo_url = fields.URL(required=True)
     created_on = fields.DateTime(dump_only=True)
     inquiry_id = fields.Int(dump_only=True)
     employees = fields.List(fields.Nested(UserResponseSchema), dump_only=True)
