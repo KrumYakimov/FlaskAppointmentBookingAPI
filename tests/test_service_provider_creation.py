@@ -29,13 +29,10 @@ class TestProviderRegistration(TestCase):
     @patch("uuid.uuid4", mock_uuid)
     @patch.object(S3Service, "upload_photo", return_value="https://mock-s3-url.com/photo.jpg")
     def test_create_service_provider(self, mocked_upload):
-        # Create a user with appropriate role
-        approver_user = ApproverFactory()  # Assuming your factory sets roles
+        approver_user = ApproverFactory()
         token = generate_token(approver_user)
 
-        # Create an inquiry that the service provider will be linked to
         inquiry = InquiryFactory(status=ProviderRegistrationState.APPROVED)
-
         data = {
             "company_name": "Delux Ltd",
             "trade_name": "Delux Beauty Center",
@@ -67,6 +64,12 @@ class TestProviderRegistration(TestCase):
         )
 
         self.assertEqual(resp.status_code, 201)
+        self.assertIn("message", resp.json)
+        self.assertEqual(resp.json["message"].strip(), "Service Provider created successfully")
+
+        uuid_value = mock_uuid()
+        name = f"{uuid_value}.{data['photo_extension']}"
+        path = os.path.join(TEMP_FILE_FOLDER, name)
 
         # Verify that the service provider was created
         providers = ServiceProviderModel.query.all()
@@ -78,5 +81,4 @@ class TestProviderRegistration(TestCase):
         self.assertEqual(provider.photo_url, mocked_upload.return_value)
         self.assertEqual(provider.inquiry.id, inquiry.id)
 
-        # Check if the upload_photo method was called with the expected parameters
-        mocked_upload.assert_called_once()
+        mocked_upload.assert_called_once_with(path, name, data['photo_extension'])
