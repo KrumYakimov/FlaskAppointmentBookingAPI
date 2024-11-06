@@ -66,16 +66,15 @@ class AppointmentBaseSchema(Schema):
 
     @validates('appointment_time')
     def validate_appointment_time(self, appointment_time):
-        """Validate that the appointment time is in the future and within working hours."""
-        # Check if appointment time is in the future
         if appointment_time < datetime.now():
             raise ValidationError("Appointment time must be in the future.")
-        # Retrieve the staff_id from the context if needed
+
         staff_id = self.context.get('staff_id')
         working_hours = WorkingHoursManager.get_working_hours(staff_id)
+
         if not working_hours:
             raise ValidationError("This staff member has no working hours defined.")
-        # Check if the appointment time falls within any of the working hours
+
         valid = False
         for hours in working_hours:
             start_time = datetime.combine(appointment_time.date(), hours.start_time)
@@ -85,6 +84,7 @@ class AppointmentBaseSchema(Schema):
                 break
         if not valid:
             raise ValidationError("Appointment time is outside of working hours.")
+
 
 class CustomerAppointmentRequestSchema(AppointmentBaseSchema):
     pass

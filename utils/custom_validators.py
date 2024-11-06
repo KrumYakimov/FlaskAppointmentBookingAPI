@@ -23,6 +23,9 @@ class PasswordValidator:
     }
 
     def validate_password(self, value):
+        if not value:
+            raise ValidationError("Password is required.")
+
         errors = self.pwd_policy.test(value)
         errors_messages = [
             self.pwd_policy_error_mapper[error.name()] for error in errors
@@ -51,11 +54,20 @@ class UniqueConstraintValidator:
     from gathering information about our user base, while still guiding legitimate users on how to proceed.
     """
 
+    # @staticmethod
+    # def check_unique_violation(
+    #     error, email_key="inquiries_email_key", phone_key="inquiries_phone_key"
+    # ):
+    #     if isinstance(error.orig, UniqueViolation):
+    #         raise Conflict(
+    #             "The provided information doesn't meet our data management policy. Please verify and try again."
+    #         )
+    #     raise Conflict("An issue occurred during registration. Please try again later.")
+
     @staticmethod
-    def check_unique_violation(
-        error, email_key="inquiries_email_key", phone_key="inquiries_phone_key"
-    ):
+    def check_unique_violation(error):
         if isinstance(error.orig, UniqueViolation):
+            print(f"Unique violation details: {error.orig}")
             raise Conflict(
                 "The provided information doesn't meet our data management policy. Please verify and try again."
             )

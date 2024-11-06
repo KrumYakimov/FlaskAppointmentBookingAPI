@@ -47,7 +47,8 @@ class CustomerAppointmentEditing(Resource):
     @permission_required(RoleType.CLIENT)
     def put(self, appointment_id):
         data = request.get_json()
-        AppointmentManager.update(appointment_id, data)
+        current_user = auth.current_user()
+        AppointmentManager.update(appointment_id, data, current_user)
         return {"message": "Appointment updated successfully"}, 200
 
 
@@ -77,15 +78,6 @@ class StaffAppointmentRejection(Resource):
         return {"message": "Appointment rejected successfully"}, 200
 
 
-class StaffAppointmentNoShow(Resource):
-    @auth.login_required
-    @permission_required(RoleType.STAFF)
-    def put(self, appointment_id):
-        current_user = auth.current_user()
-        AppointmentManager.no_show_inquiry(appointment_id, current_user)
-        return {"message": "Inquiry no showed successfully"}, 200
-
-
 class StaffAppointmentCancellation(Resource):
     @auth.login_required
     @permission_required(RoleType.STAFF)
@@ -93,6 +85,15 @@ class StaffAppointmentCancellation(Resource):
         current_user = auth.current_user()
         AppointmentManager.cancel_appointment(appointment_id, current_user)
         return {"message": "Inquiry canceled successfully"}, 200
+
+
+class StaffAppointmentNoShow(Resource):
+    @auth.login_required
+    @permission_required(RoleType.STAFF)
+    def put(self, appointment_id):
+        current_user = auth.current_user()
+        AppointmentManager.no_show_inquiry(appointment_id, current_user)
+        return {"message": "Inquiry no showed successfully"}, 200
 
 
 class StaffAppointmentCompletion(Resource):
