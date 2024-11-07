@@ -1,22 +1,18 @@
 class EmailTemplates:
-    SUBJECT_APPOINTMENT_BOOKED = "Your Appointment Has Been Booked"
+    SUBJECT_APPOINTMENT_BOOKED = "You have a new appointment booked"
     SUBJECT_APPOINTMENT_CONFIRMED = "Your Appointment Has Been Confirmed"
     SUBJECT_APPOINTMENT_UPDATED = "Your Appointment Has Been Updated"
     SUBJECT_APPOINTMENT_REJECTED = "Appointment Rejection"
     SUBJECT_APPOINTMENT_CANCELLED = "Appointment Cancellation"
 
-    CONTENT_APPOINTMENT_BOOKED = """
-    Dear {first_name},
-
-    Your appointment has been successfully booked!
-
+    CONTENT_APPOINTMENT_NOTIFIED = """
+    Dear {employee_name},
+    You have a new appointment booked!
     Appointment Details:
+    - Client Name: {client_name}
     - Service: {service_name}
     - Date & Time: {appointment_time}
-    - Employee: {employee_name}
-
-    Thank you for choosing us!
-
+    Please make sure to prepare for this appointment.
     Regards,
     Your Service Team
     """

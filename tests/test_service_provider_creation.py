@@ -1,30 +1,18 @@
 import json
 import os
-import unittest
 from unittest.mock import patch
-from flask_testing import TestCase
-from db import db
-from config import create_app
-from models import ServiceProviderModel, InquiryModel, ProviderRegistrationState
-from services.s3 import S3Service
-from tests.constants import ENCODED_PICTURE, Endpoints
-from tests.factories import ServiceProviderFactory, InquiryFactory, ApproverFactory
+
 from constants import TEMP_FILE_FOLDER
+from models import ServiceProviderModel, ProviderRegistrationState
+from services.s3 import S3Service
+from tests.base import BaseTestCase
+from tests.constants import ENCODED_PICTURE, Endpoints
+from tests.factories import InquiryFactory, ApproverFactory
 from tests.helpers import generate_token, mock_uuid
 
 
-class TestProviderRegistration(TestCase):
+class TestProviderRegistration(BaseTestCase):
     URL = Endpoints.REGISTER_PROVIDER[0]
-
-    def create_app(self):
-        return create_app("config.TestingConfig")
-
-    def setUp(self):
-        db.create_all()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
 
     @patch("uuid.uuid4", mock_uuid)
     @patch.object(S3Service, "upload_photo", return_value="https://mock-s3-url.com/photo.jpg")

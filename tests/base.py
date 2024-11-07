@@ -28,20 +28,20 @@
 #
 #
 #
+from app import environment
 from config import create_app
 from db import db
 from managers.auth_manager import AuthManager
 from flask_testing import TestCase
 
 from models import UserModel
-from tests.constants import TEST_CONFIGURATION
 
 
 class BaseTestCase(TestCase):
     _HEADER_CONT_TYPE_JSON = {"Content-Type": "application/json"}
 
     def create_app(self):
-        return create_app("config.TestingConfig")
+        return create_app(environment)
 
     def setUp(self):
         db.create_all()

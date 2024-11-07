@@ -21,6 +21,7 @@ def commit_transaction_on_teardown(exception=None):
             db.session.commit()
         except Exception as e:
             db.session.rollback()
+            logging.error(f"Error occurred during commit: {str(e)}")
             return (
                 jsonify(
                     {
@@ -39,6 +40,7 @@ def commit_transaction_on_teardown(exception=None):
         #   the next steps and preventing data contamination in complex workflows.
 
         db.session.rollback()  # rollback in case of any exception
+        logging.error(f"Error occurred during request: {str(exception)}")
         return (
             jsonify(
                 {

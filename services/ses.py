@@ -10,10 +10,10 @@ class SESService:
         self.aws_secret = config("AWS_SECRET")
         self.region = config("AWS_REGION")
         self.ses = boto3.client(
-            'ses',
+            "ses",
             aws_access_key_id=self.aws_key,
             aws_secret_access_key=self.aws_secret,
-            region_name=self.region
+            region_name=self.region,
         )
 
     def send_email(self, recipient, subject, content):
@@ -21,28 +21,16 @@ class SESService:
         try:
             resp = self.ses.send_email(
                 Source=sender,
-                Destination={
-                    'ToAddresses': [recipient]
-                },
+                Destination={"ToAddresses": [recipient]},
                 Message={
-                    'Subject': {
-                        'Data': subject,
-                        'Charset': 'UTF-8'
-                    },
-                    'Body': {
-                        'Text': {
-                            'Data': content,
-                            'Charset': 'UTF-8'
-                        }
-                    }
-                }
+                    "Subject": {"Data": subject, "Charset": "UTF-8"},
+                    "Body": {"Text": {"Data": content, "Charset": "UTF-8"}},
+                },
             )
             return resp
 
         except ClientError as e:
 
-            error_message = e.response['Error']['Message']
-
-            print(f"Error sending email: {error_message}")  # Log the error message
+            error_message = e.response["Error"]["Message"]
 
             raise BadRequest(f"Cannot send email: {error_message}")

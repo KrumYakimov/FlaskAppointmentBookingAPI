@@ -1,4 +1,4 @@
-TEST_CONFIGURATION = "config.TestingConfig"
+# TEST_CONFIGURATION = "config.TestingConfig"
 
 
 class Endpoints:

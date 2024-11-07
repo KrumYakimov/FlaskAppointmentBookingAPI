@@ -57,7 +57,7 @@ class CustomerAppointmentCancellation(Resource):
     @permission_required(RoleType.CLIENT)
     def delete(self, appointment_id):
         AppointmentManager.delete(appointment_id)
-        return {"message": "Appointment deleted successfully"}, 200
+        return "", 204
 
 
 class StaffAppointmentConfirmation(Resource):
@@ -84,7 +84,7 @@ class StaffAppointmentCancellation(Resource):
     def put(self, appointment_id):
         current_user = auth.current_user()
         AppointmentManager.cancel_appointment(appointment_id, current_user)
-        return {"message": "Inquiry canceled successfully"}, 200
+        return {"message": "Appointment canceled successfully"}, 200
 
 
 class StaffAppointmentNoShow(Resource):
@@ -93,7 +93,7 @@ class StaffAppointmentNoShow(Resource):
     def put(self, appointment_id):
         current_user = auth.current_user()
         AppointmentManager.no_show_inquiry(appointment_id, current_user)
-        return {"message": "Inquiry no showed successfully"}, 200
+        return {"message": "Appointment no showed successfully"}, 200
 
 
 class StaffAppointmentCompletion(Resource):
@@ -102,5 +102,5 @@ class StaffAppointmentCompletion(Resource):
     def put(self, appointment_id):
         current_user = auth.current_user()
         AppointmentManager.complete_appointment(appointment_id, current_user)
-        return {"message": "Inquiry completed successfully"}, 200
+        return {"message": "Appointment completed successfully"}, 200
 

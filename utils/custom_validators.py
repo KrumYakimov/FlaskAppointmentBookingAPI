@@ -67,7 +67,6 @@ class UniqueConstraintValidator:
     @staticmethod
     def check_unique_violation(error):
         if isinstance(error.orig, UniqueViolation):
-            print(f"Unique violation details: {error.orig}")
             raise Conflict(
                 "The provided information doesn't meet our data management policy. Please verify and try again."
             )

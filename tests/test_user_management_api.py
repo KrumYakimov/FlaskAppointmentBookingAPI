@@ -2,7 +2,7 @@ from random import randint
 from unittest.mock import patch
 
 from db import db
-from models import UserModel, RoleType, ProviderRegistrationState
+from models import UserModel, RoleType, ProviderRegistrationState, ServiceProviderModel
 from services.s3 import S3Service
 from tests.base import BaseTestCase
 from tests.constants import Endpoints, ENCODED_PICTURE
@@ -145,17 +145,18 @@ class TestUserRegistrationPermissions(BaseTestCase):
         headers = {"Authorization": f"Bearer {token}"}
 
         inquiry = self.create_inquiry()
-        self.create_service_provider(inquiry)
+        provider = self.create_service_provider(inquiry)
 
         for role in ["ADMIN", "APPROVER", "OWNER", "STAFF"]:
             data = self.generate_valid_user_data(role)
 
             if role == "STAFF":
-                data["service_provider_id"] = 1
+                data["service_provider_id"] = provider.id
             elif role == "OWNER":
-                data["owned_company_ids"] = [1]
+                data["owned_company_ids"] = [provider.id]
 
             resp = self.client.post(self.URL, headers=headers, json=data)
+
             self.assertEqual(resp.status_code, 201)
             self.assertIn("message", resp.json)
             self.assertEqual(resp.json["message"], f"A user with the role of {role} has been registered successfully.")
@@ -166,15 +167,15 @@ class TestUserRegistrationPermissions(BaseTestCase):
         headers = {"Authorization": f"Bearer {token}"}
 
         inquiry = self.create_inquiry()
-        self.create_service_provider(inquiry)
+        provider = self.create_service_provider(inquiry)
 
         for role in ["OWNER", "STAFF"]:
             data = self.generate_valid_user_data(role)
 
             if role == "STAFF":
-                data["service_provider_id"] = 1
+                data["service_provider_id"] = provider.id
             elif role == "OWNER":
-                data["owned_company_ids"] = [1]
+                data["owned_company_ids"] = [provider.id]
 
             resp = self.client.post(self.URL, headers=headers, json=data)
             self.assertEqual(201, resp.status_code)
@@ -185,9 +186,6 @@ class TestUserRegistrationPermissions(BaseTestCase):
         approver_user = UserFactory(role=RoleType.APPROVER)
         token = generate_token(approver_user)
         headers = {"Authorization": f"Bearer {token}"}
-
-        inquiry = self.create_inquiry()
-        self.create_service_provider(inquiry)
 
         data = self.generate_valid_user_data("ADMIN")
         resp = self.client.post(self.URL, headers=headers, json=data)
@@ -201,24 +199,24 @@ class TestUserRegistrationPermissions(BaseTestCase):
         headers = {"Authorization": f"Bearer {token}"}
 
         inquiry = self.create_inquiry()
-        self.create_service_provider(inquiry)
+        provider = self.create_service_provider(inquiry)
 
         # Valid registration for staff
         data = self.generate_valid_user_data("STAFF")
-        data["service_provider_id"] = 1
+        data["service_provider_id"] = provider.id
         resp = self.client.post(self.URL, headers=headers, json=data)
         self.assertEqual(201, resp.status_code)
         self.assertIn("message", resp.json)
         self.assertEqual(resp.json["message"], "A user with the role of STAFF has been registered successfully.")
 
         # Invalid registration for owner or admin
-        for role in ["OWNER", "ADMIN"]:
+        for role in ["ADMIN", "APPROVER", "OWNER"]:
             data = self.generate_valid_user_data(role)
 
             if role == "STAFF":
-                data["service_provider_id"] = 1
+                data["service_provider_id"] = provider.id
             elif role == "OWNER":
-                data["owned_company_ids"] = [1]
+                data["owned_company_ids"] = [provider.id]
 
             resp = self.client.post(self.URL, headers=headers, json=data)
             self.assertEqual(403, resp.status_code)
@@ -231,15 +229,15 @@ class TestUserRegistrationPermissions(BaseTestCase):
         headers = {"Authorization": f"Bearer {token}"}
 
         inquiry = self.create_inquiry()
-        self.create_service_provider(inquiry)
+        provider = self.create_service_provider(inquiry)
 
         for role in ["ADMIN", "APPROVER", "OWNER", "STAFF"]:
             data = self.generate_valid_user_data(role)
 
             if role == "STAFF":
-                data["service_provider_id"] = 1
+                data["service_provider_id"] = provider.id
             elif role == "OWNER":
-                data["owned_company_ids"] = [1]
+                data["owned_company_ids"] = [provider.id]
 
             resp = self.client.post(self.URL, headers=headers, json=data)
 
@@ -254,9 +252,6 @@ class TestUserRegistrationPermissions(BaseTestCase):
         any_user = UserFactory()  # Using any user for testing
         token = generate_token(any_user)
         headers = {"Authorization": f"Bearer {token}"}
-
-        inquiry = self.create_inquiry()
-        self.create_service_provider(inquiry)
 
         data = self.generate_valid_user_data("INVALID_ROLE")
         resp = self.client.post(self.URL, headers=headers, json=data)

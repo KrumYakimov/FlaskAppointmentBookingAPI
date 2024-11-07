@@ -356,8 +356,8 @@ class AppointmentManager:
             raise BadRequest("Staff information is missing for the appointment.")
 
         staff_email = appointment.staff.email
-        content = EmailTemplates.CONTENT_APPOINTMENT_BOOKED.format(
-            first_name=current_user.first_name,
+        content = EmailTemplates.CONTENT_APPOINTMENT_NOTIFIED.format(
+            client_name=f"{current_user.first_name} {current_user.last_name}",
             service_name=appointment.service.name,
             appointment_time=appointment.appointment_time.isoformat(),
             employee_name=f"{appointment.staff.first_name} {appointment.staff.last_name}",
