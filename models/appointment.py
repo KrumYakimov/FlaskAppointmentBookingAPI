@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from sqlalchemy import Integer, ForeignKey, String, DateTime, Float
+from sqlalchemy import Integer, ForeignKey, String, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from db import db
-from models import UserModel, ServiceModel
 from models.emums import AppointmentState
 from utils.mixins import TimestampMixin
 
@@ -27,9 +27,7 @@ class AppointmentModel(db.Model, TimestampMixin):
     )
 
     # Relationships using string-based foreign keys
-    service = relationship(
-        "ServiceModel", back_populates="appointments"
-    )
+    service = relationship("ServiceModel", back_populates="appointments")
     staff = relationship(
         "UserModel",
         foreign_keys="AppointmentModel.staff_id",
@@ -43,6 +41,8 @@ class AppointmentModel(db.Model, TimestampMixin):
 
 
 def __repr__(self):
-    return (f"<Appointment(id={self.id}, service_id={self.service_id}, "
-            f"staff_id={self.staff_id}, customer_id={self.customer_id}, "
-            f"appointment_time={self.appointment_time}, status={self.status})>")
+    return (
+        f"<Appointment(id={self.id}, service_id={self.service_id}, "
+        f"staff_id={self.staff_id}, customer_id={self.customer_id}, "
+        f"appointment_time={self.appointment_time}, status={self.status})>"
+    )

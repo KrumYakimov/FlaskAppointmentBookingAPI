@@ -36,8 +36,8 @@ class ProviderRegistrationRequestSchema(AddressSchema):
         required=True,
         error_messages={
             "required": "Inquiry ID is required.",
-            "invalid": "Inquiry ID must be an integer."
-        }
+            "invalid": "Inquiry ID must be an integer.",
+        },
     )
 
 
@@ -56,6 +56,6 @@ class ProviderEditRequestSchema(AddressSchema):
     )
 
     @validates_schema
-    def validate_at_least_one_field(self, data, **kwargs):
+    def validate_at_least_one_field(self, data: dict, **kwargs) -> None:
         if not any(data.values()):
             raise ValidationError("At least one field must be provided for editing.")

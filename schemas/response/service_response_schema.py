@@ -12,5 +12,3 @@ class ServiceResponseSchema(Schema):
     updated_at = fields.DateTime(dump_only=True)
     # TODO: Fetch the subcategory name along with the categories' IDs and names.
     # TODO: Get all available services - list the different (distinct) values.
-
-

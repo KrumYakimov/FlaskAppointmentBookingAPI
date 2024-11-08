@@ -27,7 +27,7 @@ class UserRegistrationRequestSchema(PersonalInfoSchema):
     owned_company_ids = fields.List(fields.Int(), required=False)
 
     @validates_schema
-    def validate_role_fields(self, data, **kwargs):
+    def validate_role_fields(self, data: dict, **kwargs) -> None:
         """
         Validate that only the appropriate fields are provided based on the role.
         If both service_provider_id and owned_company_ids are provided, or if
@@ -86,7 +86,7 @@ class PasswordChangeSchema(Schema):
     )
 
     @validates_schema
-    def validate_passwords(self, data, **kwargs):
+    def validate_passwords(self, data: dict, **kwargs) -> None:
         if data["old_password"] == data["new_password"]:
             raise ValidationError(
                 "New password cannot be the same as the old password.",
@@ -101,6 +101,6 @@ class UserEditRequestSchema(Schema):
     phone = PersonalInfoValidator.phone(required=False)
 
     @validates_schema
-    def validate_at_least_one_field(self, data, **kwargs):
+    def validate_at_least_one_field(self, data: dict, **kwargs) -> None:
         if not any(data.values()):
             raise ValidationError("At least one field must be provided for editing.")

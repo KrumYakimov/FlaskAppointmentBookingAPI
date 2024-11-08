@@ -54,18 +54,13 @@ class UniqueConstraintValidator:
     from gathering information about our user base, while still guiding legitimate users on how to proceed.
     """
 
-    # @staticmethod
-    # def check_unique_violation(
-    #     error, email_key="inquiries_email_key", phone_key="inquiries_phone_key"
-    # ):
-    #     if isinstance(error.orig, UniqueViolation):
-    #         raise Conflict(
-    #             "The provided information doesn't meet our data management policy. Please verify and try again."
-    #         )
-    #     raise Conflict("An issue occurred during registration. Please try again later.")
-
     @staticmethod
-    def check_unique_violation(error):
+    def check_unique_violation(error) -> None:
+        """
+        Checks for unique constraint violations in the provided error
+        :param error: The error to check for unique violations.
+        :raises Conflict: If a unique violation occurs.
+        """
         if isinstance(error.orig, UniqueViolation):
             raise Conflict(
                 "The provided information doesn't meet our data management policy. Please verify and try again."
@@ -78,7 +73,7 @@ class UniqueConstraintValidator:
 
 class PersonalInfoValidator:
     @staticmethod
-    def email(required=True):
+    def email(required: bool = True) -> fields.Email:
         return fields.Email(
             required=required,
             validate=validate.Email(error="Invalid email format."),
@@ -86,7 +81,7 @@ class PersonalInfoValidator:
         )
 
     @staticmethod
-    def first_name(required=True):
+    def first_name(required: bool = True) -> fields.Str:
         return fields.Str(
             required=required,
             validate=[
@@ -105,7 +100,7 @@ class PersonalInfoValidator:
         )
 
     @staticmethod
-    def last_name(required=True):
+    def last_name(required: bool = True) -> fields.Str:
         return fields.Str(
             required=required,
             validate=[
@@ -122,22 +117,26 @@ class PersonalInfoValidator:
         )
 
     @staticmethod
-    def phone(required=True):
+    def phone(required: bool = True) -> fields.Str:
         return fields.Str(
             required=required,
             validate=validate.Regexp(
                 r"^0\d{9,14}$",
-                error="Phone number must start with 0 and contain exactly 10 to 15 digits."
+                error="Phone number must start with 0 and contain exactly 10 to 15 digits.",
             ),
-            error_messages={
-                "required": "Phone number is required."
-            },
+            error_messages={"required": "Phone number is required."},
         )
 
 
 class RoleValidator:
     @staticmethod
-    def validate_role(value):
+    def validate_role(value: str) -> None:
+        """
+        Validates that the provided role is allowed.
+
+        :param value: The role to validate.
+        :raises ValidationError: If the role is invalid.
+        """
         value = value
         allowed_roles = set(ROLE_PERMISSIONS.keys()) | {
             role
@@ -161,7 +160,7 @@ class RoleValidator:
 
 class AddressFieldValidator:
     @staticmethod
-    def country(required=True):
+    def country(required: bool = True) -> fields.Str:
         return fields.Str(
             required=required,
             validate=[
@@ -179,7 +178,7 @@ class AddressFieldValidator:
         )
 
     @staticmethod
-    def district(required=False):
+    def district(required: bool = False) -> fields.Str:
         return fields.Str(
             required=required,
             validate=validate.Length(
@@ -190,7 +189,7 @@ class AddressFieldValidator:
         )
 
     @staticmethod
-    def city(required=True):
+    def city(required: bool = True) -> fields.Str:
         return fields.Str(
             required=required,
             validate=validate.Length(
@@ -200,7 +199,7 @@ class AddressFieldValidator:
         )
 
     @staticmethod
-    def neighborhood(required=False):
+    def neighborhood(required: bool = False) -> fields.Str:
         return fields.Str(
             required=required,
             validate=validate.Length(
@@ -211,7 +210,7 @@ class AddressFieldValidator:
         )
 
     @staticmethod
-    def street(required=True):
+    def street(required: bool = True) -> fields.Str:
         return fields.Str(
             required=required,
             validate=validate.Length(
@@ -223,7 +222,7 @@ class AddressFieldValidator:
         )
 
     @staticmethod
-    def street_number(required=True):
+    def street_number(required: bool = True) -> fields.Str:
         return fields.Str(
             required=required,
             validate=validate.Regexp(
@@ -236,7 +235,7 @@ class AddressFieldValidator:
         )
 
     @staticmethod
-    def block_number(required=False):
+    def block_number(required: bool = False) -> fields.Str:
         return fields.Str(
             required=required,
             validate=validate.Length(
@@ -245,7 +244,7 @@ class AddressFieldValidator:
         )
 
     @staticmethod
-    def apartment(required=False):
+    def apartment(required: bool = False) -> fields.Str:
         return fields.Str(
             required=required,
             validate=validate.Length(
@@ -256,7 +255,7 @@ class AddressFieldValidator:
         )
 
     @staticmethod
-    def floor(required=False):
+    def floor(required: bool = False) -> fields.Str:
         return fields.Str(
             required=required,
             validate=validate.Length(
@@ -265,7 +264,7 @@ class AddressFieldValidator:
         )
 
     @staticmethod
-    def postal_code(required=True):
+    def postal_code(required: bool = True) -> fields.Str:
         return fields.Str(
             required=required,
             validate=[
@@ -284,7 +283,7 @@ class AddressFieldValidator:
         )
 
     @staticmethod
-    def latitude(required=False):
+    def latitude(required: bool = False) -> fields.Float:
         return fields.Float(
             required=required,
             validate=validate.Range(
@@ -293,7 +292,7 @@ class AddressFieldValidator:
         )
 
     @staticmethod
-    def longitude(required=False):
+    def longitude(required: bool = False) -> fields.Float:
         return fields.Float(
             required=required,
             validate=validate.Range(

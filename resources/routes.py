@@ -54,6 +54,7 @@ from resources.working_hours_resources import (
     WorkingHourEditing,
     WorkingHourDeactivate,
 )
+from static.swagger import SwaggerJson
 
 routes = (
     # UserManagement API #
@@ -295,4 +296,12 @@ routes = (
         StaffAppointmentCompletion,
         "/appointments/<int:appointment_id>/complete"
     ),
+
+    # Swagger
+    (
+        SwaggerJson,
+        "/swagger.json"
+    ),
 )
+
+

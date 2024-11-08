@@ -45,15 +45,21 @@ class UserModel(db.Model, PersonalInfoMixin, TimestampMixin):
     services = relationship("ServiceModel", back_populates="staff", lazy="select")
 
     # Relationship with the WorkingHoursModel
-    working_hours = relationship("WorkingHoursModel", back_populates="employee", lazy="select")
+    working_hours = relationship(
+        "WorkingHoursModel", back_populates="employee", lazy="select"
+    )
 
     customer_appointments = relationship(
-        "AppointmentModel", foreign_keys="AppointmentModel.customer_id", back_populates="customer"
+        "AppointmentModel",
+        foreign_keys="AppointmentModel.customer_id",
+        back_populates="customer",
     )
 
     # Relationship to appointments as staff
     staff_appointments = relationship(
-        "AppointmentModel", foreign_keys="AppointmentModel.staff_id", back_populates="staff"
+        "AppointmentModel",
+        foreign_keys="AppointmentModel.staff_id",
+        back_populates="staff",
     )
 
     # Soft delete check for queries

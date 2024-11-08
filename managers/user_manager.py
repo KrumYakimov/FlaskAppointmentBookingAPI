@@ -1,3 +1,5 @@
+from typing import Dict, Any, Optional, List
+
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import BadRequest, Unauthorized, NotFound
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -14,13 +16,13 @@ class UserManager:
     EMAIL_ALREADY_IN_USE_MESSAGE = "Email is already in use"
 
     @staticmethod
-    def register(client_data: dict) -> str:
+    def register(client_data: Dict[str, Any]) -> str:
         """
-        Hashes the plain password
+        Registers a new client and hashes the password.
 
-        :param client_data: dict containing client details (e.g., email, password).
-        :return: client
-        :raises InternalServerError: If there's a database error.
+        :param client_data: Dictionary containing client details (e.g., email, password).
+        :return: The JWT token for the registered client.
+        :raises IntegrityError: If there's a database error due to unique constraints.
         """
 
         client_data["password"] = generate_password_hash(
@@ -41,11 +43,11 @@ class UserManager:
             validator.check_unique_violation(e)
 
     @staticmethod
-    def login(data: dict) -> str:
+    def login(data: Dict[str, Any]) -> str:
         """
-        Checks the email and password (hashes the plain password)
+        Authenticates a user by checking the email and password.
 
-        :param data: dict containing 'email' and 'password'.
+        :param data: Dictionary containing 'email' and 'password'.
         :return: A JWT token as a string for the logged-in user.
         :raises Unauthorized: If the email or password is incorrect.
         """
@@ -58,7 +60,13 @@ class UserManager:
         return AuthManager.encode_token(user)
 
     @staticmethod
-    def change_password(pass_data: dict) -> None:
+    def change_password(pass_data: Dict[str, Any]) -> None:
+        """
+        Changes the password of the currently authenticated user.
+
+        :param pass_data: Dictionary containing 'old_password' and 'new_password'.
+        :raises BadRequest: If the old password is incorrect.
+        """
         user = auth.current_user()
 
         if not check_password_hash(user.password, pass_data["old_password"]):
@@ -71,13 +79,13 @@ class UserManager:
         db.session.flush()
 
     @staticmethod
-    def get_client_profile(current_user):
+    def get_client_profile(current_user: UserModel) -> UserModel:
         """
         Retrieves the profile of the logged-in client.
 
-        :param current_user: The currently authenticated user (instance of UserModel)
-        :return: The user's profile data
-        :raises NotFound: If the user does not exist
+        :param current_user: The currently authenticated user (instance of UserModel).
+        :return: The user's profile data.
+        :raises NotFound: If the user does not exist.
         """
 
         client_profile = db.session.execute(
@@ -90,13 +98,13 @@ class UserManager:
         return client_profile
 
     @staticmethod
-    def update_user_profile(user, data):
+    def update_user_profile(user: UserModel, data: Dict[str, Any]) -> None:
         """
-        Updates the user attributes and handles uniqueness validation.
+        Updates the attributes of the given user.
 
-        :param user: The user object to be updated
-        :param data: Dictionary containing updated user fields
-        :raises IntegrityError: If a unique constraint is violated
+        :param user: The user object to be updated.
+        :param data: Dictionary containing updated user fields.
+        :raises IntegrityError: If a unique constraint is violated.
         """
         user.email = data.get("email", user.email)
         user.first_name = data.get("first_name", user.first_name)
@@ -113,21 +121,37 @@ class UserManager:
             validator.check_unique_violation(e)
 
     @staticmethod
-    def edit_client_profile(current_user, client_data):
+    def edit_client_profile(
+        current_user: UserModel, client_data: Dict[str, Any]
+    ) -> None:
         """
         Edits the profile of the current user (client).
 
-        :param current_user: The user object of the current client
-        :param client_data: Dictionary containing updated client fields
+        :param current_user: The user object of the current client.
+        :param client_data: Dictionary containing updated client fields.
         """
         UserManager.update_user_profile(current_user, client_data)
 
     @staticmethod
-    def deactivate_client(current_user):
+    def deactivate_client(current_user: UserModel) -> None:
+        """
+        Deactivates the current client.
+
+        :param current_user: The user object of the current client.
+        """
         UserManager._deactivate_user(current_user)
 
     @staticmethod
-    def register_user(current_user, user_data):
+    def register_user(current_user: UserModel, user_data: Dict[str, Any]) -> str:
+        """
+        Registers a new user (staff or owner) and hashes the password.
+
+        :param current_user: The user object of the current client (who is registering a user).
+        :param user_data: Dictionary containing new user details (email, password, etc.).
+        :return: The role of the newly created user.
+        :raises NotFound: If associated service providers are not found.
+        :raises IntegrityError: If a unique constraint is violated.
+        """
         user_data["password"] = generate_password_hash(
             user_data["password"], method="pbkdf2:sha256"
         )
@@ -172,10 +196,18 @@ class UserManager:
             validator.check_unique_violation(e)
 
     @staticmethod
-    def get_users(current_user, status=None, user_number=None):
+    def get_users(
+        current_user: UserModel,
+        status: Optional[str] = None,
+        user_number: Optional[int] = None,
+    ) -> List[UserModel]:
         """
         Retrieves a list of users relative to the current user's rights.
-        Can filter by status (active/inactive) or user number.
+
+        :param current_user: The currently authenticated user.
+        :param status: Optional status filter (e.g., active/inactive).
+        :param user_number: Optional specific user ID to retrieve.
+        :return: A list of users matching the criteria.
         """
 
         stmt = db.select(UserModel).distinct()
@@ -215,13 +247,13 @@ class UserManager:
         return users
 
     @staticmethod
-    def edit_user_profile(user_data, user_id):
+    def edit_user_profile(user_data: Dict[str, Any], user_id: int) -> None:
         """
-        Edits the profile of the user with the given user_id.
+        Edits the profile of the user with the given user ID.
 
-        :param user_data: Dictionary containing updated user fields
-        :param user_id: ID of the user to be updated
-        :raises NotFound: If the user with the given ID is not found
+        :param user_data: Dictionary containing updated user fields.
+        :param user_id: ID of the user to be updated.
+        :raises NotFound: If the user with the given ID is not found.
         """
         user = db.session.execute(
             db.select(UserModel).filter_by(id=user_id)
@@ -233,7 +265,13 @@ class UserManager:
         UserManager.update_user_profile(user, user_data)
 
     @staticmethod
-    def deactivate_user(user_id):
+    def deactivate_user(user_id: int) -> None:
+        """
+        Deactivates a user by their ID.
+
+        :param user_id: The ID of the user to deactivate.
+        :raises NotFound: If the user with the given ID is not found.
+        """
         user = db.session.execute(
             db.select(UserModel).filter_by(id=user_id)
         ).scalar_one_or_none()
@@ -245,7 +283,12 @@ class UserManager:
 
     # Soft deletion: Deactivate the account and mask sensitive data
     @staticmethod
-    def _deactivate_user(user):
+    def _deactivate_user(user: UserModel) -> None:
+        """
+        Deactivates the account and masks sensitive user data.
+
+        :param user: The user object to deactivate.
+        """
         user.is_active = False
         user.first_name = "Deactivated"
         user.last_name = "User"

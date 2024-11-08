@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema
 from marshmallow import fields, validate
 
 

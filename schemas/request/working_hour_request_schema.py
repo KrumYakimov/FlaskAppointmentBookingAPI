@@ -10,8 +10,12 @@ class WorkingHourBaseSchema(Schema):
             "invalid": "Day of the week must be an integer between 0 (Monday) and 6 (Sunday).",
         },
     )
-    start_time = fields.Time(required=True, error_messages={"required": "Start time is required."})
-    end_time = fields.Time(required=True, error_messages={"required": "End time is required."})
+    start_time = fields.Time(
+        required=True, error_messages={"required": "Start time is required."}
+    )
+    end_time = fields.Time(
+        required=True, error_messages={"required": "End time is required."}
+    )
     provider_id = fields.Int(required=True)
     employee_id = fields.Int(required=True)
 
@@ -22,28 +26,34 @@ class EmployeeWorkingHoursSchema(Schema):
 
 
 class WorkingHourBatchSchema(Schema):
-    # Fields for single entry registration
     day_of_week = fields.Int(validate=validate.Range(min=0, max=6))
     start_time = fields.Time()
     end_time = fields.Time()
     provider_id = fields.Int()
     employee_id = fields.Int()
 
-    # Required field for batch entries
     employees = fields.List(fields.Nested(EmployeeWorkingHoursSchema), required=False)
 
     @staticmethod
-    def validate_required_fields(data):
+    def validate_required_fields(data: dict) -> None:
         if "employees" in data:
-            # Batch registration: Ensure `employees` is populated with working hours for each employee
             if not data["employees"]:
-                raise ValidationError("Employees list cannot be empty for batch registration.")
+                raise ValidationError(
+                    "Employees list cannot be empty for batch registration."
+                )
         else:
-            # Single entry registration: Ensure all fields are present
-            required_fields = ["day_of_week", "start_time", "end_time", "provider_id", "employee_id"]
+            required_fields = [
+                "day_of_week",
+                "start_time",
+                "end_time",
+                "provider_id",
+                "employee_id",
+            ]
             missing_fields = [field for field in required_fields if field not in data]
             if missing_fields:
-                raise ValidationError(f"Missing required fields for single registration: {', '.join(missing_fields)}")
+                raise ValidationError(
+                    f"Missing required fields for single registration: {', '.join(missing_fields)}"
+                )
 
 
 class WorkingHourEditRequestSchema(WorkingHourBaseSchema):

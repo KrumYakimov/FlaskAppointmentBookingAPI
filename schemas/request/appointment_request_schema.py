@@ -4,37 +4,6 @@ from datetime import datetime
 from managers.working_hours_manager import WorkingHoursManager
 
 
-# class AvailableSlotsRequestSchema(Schema):
-#     service_id = fields.Int(
-#         required=True,
-#         error_messages={
-#             "required": "Service ID is required.",
-#             "invalid": "Service ID must be an integer."
-#         }
-#     )
-#     staff_id = fields.Int(
-#         required=True,
-#         error_messages={
-#             "required": "Staff ID is required.",
-#             "invalid": "Staff ID must be an integer."
-#         }
-#     )
-#     date = fields.DateTime(
-#         required=True,
-#         format="%Y-%m-%dT%H:%M:%S",
-#         error_messages={
-#             "required": "Date is required.",
-#             "invalid": "Date must be a valid datetime in ISO format."
-#         }
-#     )
-#
-#     @validates('date')
-#     def validate_date(self, date):
-#         """Custom validation to ensure the date is in the future."""
-#         if date < datetime.now():
-#             raise ValidationError("The date must be in the future.")
-
-
 class AppointmentBaseSchema(Schema):
     service_id = fields.Int(
         required=True,
@@ -58,18 +27,12 @@ class AppointmentBaseSchema(Schema):
         },
     )
 
-    # @validates("appointment_time")
-    # def validate_appointment_time_field(self, appointment_time):
-    #     """Validate that the appointment time is in the future."""
-    #     if appointment_time < datetime.now():
-    #         raise ValidationError("Appointment time must be in the future.")
-
-    @validates('appointment_time')
-    def validate_appointment_time(self, appointment_time):
+    @validates("appointment_time")
+    def validate_appointment_time(self, appointment_time: datetime) -> None:
         if appointment_time < datetime.now():
             raise ValidationError("Appointment time must be in the future.")
 
-        staff_id = self.context.get('staff_id')
+        staff_id = self.context.get("staff_id")
         working_hours = WorkingHoursManager.get_working_hours(staff_id)
 
         if not working_hours:

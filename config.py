@@ -1,9 +1,9 @@
 from decouple import config
-
 from flask import Flask
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api
+from flask_swagger_ui import get_swaggerui_blueprint
 
 from db import db
 from resources.routes import routes
@@ -49,5 +49,17 @@ def create_app(environment):
     CORS(app)
     [api.add_resource(*route) for route in routes]
 
-    return app
+    # Define the Swagger UI blueprint
+    SWAGGER_URL = '/swagger'
+    API_URL = '/swagger.json'  # This should match where your Swagger JSON is served
 
+    swaggerui_blueprint = get_swaggerui_blueprint(
+        SWAGGER_URL,
+        API_URL,
+        config={'app_name': "Online Appointment Booking System"}
+    )
+
+    # Register the Swagger UI blueprint
+    app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
+    return app

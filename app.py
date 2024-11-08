@@ -7,7 +7,9 @@ from config import create_app
 from db import db
 
 # Set up basic logging configuration
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 environment = config("CONFIG_ENV")
 app = create_app(environment)
@@ -69,4 +71,3 @@ def shutdown_session(response, exception=None):
     """
     db.session.remove()
     return response
-

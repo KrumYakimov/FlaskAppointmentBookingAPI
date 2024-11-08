@@ -19,25 +19,30 @@ class AppointmentManager:
     TWO_HOURS_BEFORE = timedelta(hours=2)
 
     @staticmethod
-    def get_available_slots(staff_id, service_duration, date_str):
-        """Retrieve available time slots for a given employee on a specific date."""
+    def get_available_slots(
+        staff_id: int, service_duration: int, date_str: str
+    ) -> list:
+        """
+        Retrieves available time slots for a given staff member on a specified date
+        :param staff_id: The ID of the staff member.
+        :param service_duration: The duration of the service in minutes.
+        :param date_str: The date in ISO format for which to retrieve available slots.
+        :return: A list of available time slots with start and end times.
+        :raises ValueError: If the date format is invalid.
+        """
         try:
             date = datetime.fromisoformat(date_str)
         except ValueError:
             raise ValueError("Invalid date format. Please use ISO format.")
 
-        # Get the day of the week (0=Monday, 6=Sunday)
         day_of_week = date.weekday()
 
-        # Retrieve working hours for the employee for that specific day
         working_hours = WorkingHoursManager.get_working_hours(staff_id=staff_id)
 
-        # Filter working hours to get only those relevant for the specific day
         daily_working_hours = [
             wh for wh in working_hours if wh.day_of_week == day_of_week
         ]
 
-        # Retrieve existing appointments for the employee on the specified date
         existing_appointments = (
             (
                 db.session.execute(
@@ -54,17 +59,14 @@ class AppointmentManager:
 
         available_slots = []
 
-        # Loop through the daily working hours to calculate available slots
         for hours in daily_working_hours:
             start_time = datetime.combine(date.date(), hours.start_time)
             end_time = datetime.combine(date.date(), hours.end_time)
 
-            # Create a list of time slots based on working hours and service duration
             while start_time + timedelta(minutes=service_duration) <= end_time:
                 slot_start = start_time
                 slot_end = start_time + timedelta(minutes=service_duration)
 
-                # Check if the slot overlaps with existing appointments
                 if not any(
                     (
                         slot_start
@@ -87,10 +89,22 @@ class AppointmentManager:
 
     @staticmethod
     def get_all():
+        """
+        Retrieves all appointment records from the database
+        :return: A list of all appointments.
+        """
         return db.session.execute(db.select(AppointmentModel)).scalars().all()
 
     @staticmethod
-    def create(data, current_user):
+    def create(data: dict, current_user: UserModel) -> AppointmentModel:
+        """
+        Creates a new appointment record in the database
+        :param data: A dictionary containing appointment details such as staff_id, appointment_time, etc.
+        :param current_user: The user creating the appointment.
+        :return: The created AppointmentModel instance.
+        :raises ValueError: If the appointment time format is invalid.
+        :raises Conflict: If the selected time slot is already booked or if the service ID is invalid.
+        """
         staff_id = data.get("staff_id")
         appointment_time_str = data.get("appointment_time")
 
@@ -135,6 +149,16 @@ class AppointmentManager:
     def update(
         appointment_id: int, data: dict, current_user: UserModel
     ) -> AppointmentModel:
+        """
+        Updates an existing appointment record in the database
+        :param appointment_id: The ID of the appointment to update.
+        :param data: A dictionary containing updated appointment details.
+        :param current_user: The user performing the update.
+        :return: The updated AppointmentModel instance.
+        :raises NotFound: If the appointment does not exist.
+        :raises Forbidden: If the appointment cannot be edited due to its current status.
+        :raises BadRequest: If the update fails.
+        """
         appointment = db.session.execute(
             db.select(AppointmentModel).filter(AppointmentModel.id == appointment_id)
         ).scalar_one_or_none()
@@ -185,7 +209,12 @@ class AppointmentManager:
         return appointment
 
     @staticmethod
-    def delete(appointment_id):
+    def delete(appointment_id: int) -> None:
+        """
+        Deletes an appointment record from the database
+        :param appointment_id: The ID of the appointment to delete.
+        :raises NotFound: If the appointment does not exist.
+        """
         appointment = db.session.query(AppointmentModel).get(appointment_id)
         if appointment is None:
             raise NotFound("Appointment not found.")
@@ -194,7 +223,18 @@ class AppointmentManager:
         db.session.flush()
 
     @staticmethod
-    def update_appointment_status(appointment_id, current_user, new_status):
+    def update_appointment_status(
+        appointment_id: int, current_user: UserModel, new_status: str
+    ) -> AppointmentModel:
+        """
+        Updates the status of an existing appointment
+        :param appointment_id: The ID of the appointment to update.
+        :param current_user: The user performing the status update.
+        :param new_status: The new status to set for the appointment.
+        :return: The updated AppointmentModel instance.
+        :raises NotFound: If the appointment does not exist.
+        :raises Forbidden: If the user does not have permission to change the status.
+        """
         staff_id = current_user.id
 
         appointment = db.session.execute(
@@ -231,7 +271,17 @@ class AppointmentManager:
         return appointment
 
     @staticmethod
-    def confirm_appointment(appointment_id, current_user):
+    def confirm_appointment(
+        appointment_id: int, current_user: UserModel
+    ) -> AppointmentModel:
+        """
+        Confirms an existing appointment
+        :param appointment_id: The ID of the appointment to confirm.
+        :param current_user: The user performing the confirmation.
+        :return: The confirmed AppointmentModel instance.
+        :raises NotFound: If the appointment does not exist.
+        :raises BadRequest: If customer information is missing.
+        """
         appointment = AppointmentManager.update_appointment_status(
             appointment_id, current_user, AppointmentState.CONFIRMED.value
         )
@@ -268,7 +318,17 @@ class AppointmentManager:
         return appointment
 
     @staticmethod
-    def reject_appointment(appointment_id, current_user):
+    def reject_appointment(
+        appointment_id: int, current_user: UserModel
+    ) -> AppointmentModel:
+        """
+        Rejects an existing appointment
+        :param appointment_id: The ID of the appointment to reject.
+        :param current_user: The user performing the rejection.
+        :return: The rejected AppointmentModel instance.
+        :raises NotFound: If the appointment does not exist.
+        :raises BadRequest: If customer information is missing.
+        """
         appointment = AppointmentManager.update_appointment_status(
             appointment_id, current_user, AppointmentState.REJECTED.value
         )
@@ -293,7 +353,6 @@ class AppointmentManager:
                 appointment_id,
             )
         except BadRequest as e:
-            # Rollback the appointment status change on error
             db.session.rollback()
             logging.error(
                 f"Failed to send rejection email for appointment {appointment_id}: {e}"
@@ -303,7 +362,17 @@ class AppointmentManager:
         return appointment
 
     @staticmethod
-    def cancel_appointment(appointment_id, current_user):
+    def cancel_appointment(
+        appointment_id: int, current_user: UserModel
+    ) -> AppointmentModel:
+        """
+        Cancels an existing appointment
+        :param appointment_id: The ID of the appointment to cancel.
+        :param current_user: The user performing the cancellation.
+        :return: The canceled AppointmentModel instance.
+        :raises NotFound: If the appointment does not exist.
+        :raises BadRequest: If customer information is missing.
+        """
         appointment = AppointmentManager.update_appointment_status(
             appointment_id, current_user, AppointmentState.CANCELLED.value
         )
@@ -329,7 +398,6 @@ class AppointmentManager:
                 appointment_id,
             )
         except BadRequest as e:
-            # Rollback the appointment status change on error
             db.session.rollback()
             logging.error(
                 f"Failed to send cancellation email for appointment {appointment_id}: {e}"
@@ -339,19 +407,39 @@ class AppointmentManager:
         return appointment
 
     @staticmethod
-    def no_show_inquiry(appointment_id, current_user):
+    def no_show_inquiry(
+        appointment_id: int, current_user: UserModel
+    ) -> AppointmentModel:
+        """
+        Marks an appointment as a no-show
+        :param appointment_id: The ID of the appointment to mark as no-show.
+        :param current_user: The user performing the operation.
+        :return: The AppointmentModel instance with the no-show status.
+        """
         return AppointmentManager.update_appointment_status(
             appointment_id, current_user, AppointmentState.NO_SHOW.value
         )
 
     @staticmethod
     def complete_appointment(appointment_id, current_user):
+        """
+        Marks an appointment as completed
+        :param appointment_id: The ID of the appointment to mark as completed.
+        :param current_user: The user performing the operation.
+        :return: The AppointmentModel instance with the completed status.
+        """
         return AppointmentManager.update_appointment_status(
             appointment_id, current_user, AppointmentState.COMPLETED.value
         )
 
     @staticmethod
-    def notify_staff(appointment, current_user):
+    def notify_staff(appointment: AppointmentModel, current_user: UserModel) -> None:
+        """
+        Notifies the staff member assigned to an appointment via email
+        :param appointment: The AppointmentModel instance to notify staff about.
+        :param current_user: The user performing the operation, used to personalize the email.
+        :raises BadRequest: If staff information is missing or invalid.
+        """
         if appointment.staff is None or not appointment.staff.email:
             raise BadRequest("Staff information is missing for the appointment.")
 
@@ -371,7 +459,17 @@ class AppointmentManager:
         )
 
     @staticmethod
-    def send_notification_email(recipient, subject, content, appointment_id):
+    def send_notification_email(
+        recipient: str, subject: str, content: str, appointment_id: int
+    ) -> None:
+        """
+        Sends a notification email
+        :param recipient: The email address of the recipient.
+        :param subject: The subject line of the email.
+        :param content: The body content of the email.
+        :param appointment_id: The ID of the appointment associated with the email.
+        :raises BadRequest: If sending the email fails.
+        """
         try:
             ses_service.send_email(recipient, subject, content)
             logging.info(
@@ -381,34 +479,17 @@ class AppointmentManager:
             logging.error(f"Error occurred while sending email: {e}")
             raise BadRequest("Failed to send notification email.")
 
-    # @staticmethod
-    # def send_reminder_emails():
-    #     now = datetime.now()
-    #
-    #     # Fetch appointments for 1-day reminders
-    #     reminder_time_1 = now + AppointmentManager.ONE_DAY_BEFORE
-    #     appointments_to_remind_1d = AppointmentManager._fetch_appointments_within_time_range(
-    #         reminder_time_1, reminder_time_1 + timedelta(days=1)  # 1-day range
-    #     )
-    #     AppointmentManager._send_reminder_emails(
-    #         appointments_to_remind_1d,
-    #         "Appointment Reminder - 1 Day Before",
-    #         EmailTemplates.CONTENT_REMINDER_1_DAY,
-    #     )
-    #
-    #     # Fetch appointments for 2-hour reminders
-    #     reminder_time_2 = now + AppointmentManager.TWO_HOURS_BEFORE
-    #     appointments_to_remind_2h = AppointmentManager._fetch_appointments_within_time_range(
-    #         reminder_time_2, reminder_time_2 + timedelta(hours=2)  # 2-hour range
-    #     )
-    #     AppointmentManager._send_reminder_emails(
-    #         appointments_to_remind_2h,
-    #         "Upcoming Appointment Reminder - 2 Hours Before",
-    #         EmailTemplates.CONTENT_REMINDER_2_HOURS,
-    #     )
-
     @staticmethod
-    def is_slot_booked(staff_id, appointment_time, service_duration):
+    def is_slot_booked(
+        staff_id: int, appointment_time: datetime, service_duration: int
+    ) -> int:
+        """
+        Checks if a time slot is already booked for a given staff member
+        :param staff_id: The ID of the staff member.
+        :param appointment_time: The desired appointment time.
+        :param service_duration: The duration of the service in minutes.
+        :return: True if the slot is booked, otherwise False.
+        """
         if isinstance(appointment_time, str):
             appointment_time = datetime.fromisoformat(appointment_time)
 
@@ -429,42 +510,3 @@ class AppointmentManager:
         )
 
         return len(overlapping_appointments) > 0
-
-    # @staticmethod
-    # def _fetch_appointments_within_time_range(time_range_start, time_range_end):
-    #     return (
-    #         db.session.execute(
-    #             db.select(AppointmentModel).filter(
-    #                 AppointmentModel.appointment_time.between(
-    #                     time_range_start, time_range_end
-    #                 )
-    #             )
-    #         )
-    #         .scalars()
-    #         .all()
-    #     )
-    #
-    # @staticmethod
-    # def _send_reminder_emails(appointments, subject, message_template):
-    #     for appointment in appointments:
-    #         if appointment.customer is None or not appointment.customer.email:
-    #             logging.warning(
-    #                 f"Missing or invalid email for appointment ID {appointment.id}."
-    #             )
-    #             continue
-    #
-    #         recipient = appointment.customer.email
-    #         content = message_template.format(
-    #             customer_name=appointment.customer.first_name,
-    #             appointment_time=appointment.appointment_time.isoformat(),
-    #         )
-    #
-    #         try:
-    #             AppointmentManager.send_notification_email(recipient, subject, content, appointment.id)
-    #             logging.info(
-    #                 f"Reminder email sent to {recipient} for appointment ID {appointment.id}."
-    #             )
-    #         except BadRequest as e:
-    #             logging.error(f"Failed to send email to {recipient}: {e}")
-    #             raise BadRequest("Failed to send reminder email.")
-

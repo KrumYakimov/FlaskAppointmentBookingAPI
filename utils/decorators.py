@@ -10,6 +10,13 @@ from utils.role_permitions import ROLE_PERMISSIONS
 
 
 def permission_required(*required_roles):
+    """
+    Decorator to enforce role-based access control on Flask views.
+    :param required_roles: Roles that are allowed to access the decorated function.
+    :raises Unauthorized: If the user is not authenticated.
+    :raises Forbidden: If the user does not have the required role.
+    """
+
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -29,6 +36,12 @@ def permission_required(*required_roles):
 
 
 def validate_schema(schema_name):
+    """
+    Decorator to validate incoming request data against a Marshmallow schema.
+    :param schema_name: The schema class to validate against.
+    :raises BadRequest: If the request payload is missing, not JSON, or does not match the schema.
+    """
+
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -52,7 +65,13 @@ def validate_schema(schema_name):
     return decorator
 
 
-def role_based_access_control(action):
+def role_based_access_control(action: str):
+    """
+    Decorator for role-based access control on actions performed on users.
+    :param action: The action being performed (e.g., 'view', 'edit', 'deactivate').
+    :raises Forbidden: If the user does not have permission for the action.
+    """
+
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
