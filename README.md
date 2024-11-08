@@ -279,7 +279,7 @@ For more details on how to configure the Swagger UI or to modify the Swagger JSO
   - `409 Conflict`: The provided information doesn't meet our data management policy. Please verify and try again.
 
 #### 8. User Profile
-- **Endpoint**: `"/users/profile", "/users/profile/<string:status>", "/users/profile/<int:user_id>"`
+- **Endpoint**: `"/users/profile", "/users/profile/{status}", "/users/profile/{id}"`
 - **Method**: `GET`
 - **Description**: Retrieves the profile information of the user.
 - **Responses**:
@@ -288,7 +288,7 @@ For more details on how to configure the Swagger UI or to modify the Swagger JSO
   - `404 Not Found`: User does not exist.
 
 #### 9. User Editing
-- **Endpoint**: `/users/<int:user_id>/edit/`
+- **Endpoint**: `/users/{id}/edit/`
 - **Method**: `PUT`
 - **Description**: Updates the specified user's profile information.
 - **Request Body**:
@@ -300,14 +300,148 @@ For more details on how to configure the Swagger UI or to modify the Swagger JSO
       "phone": "string"
   }
   ```
+- **Responses**:
+  - `200 OK`: User account successfully updated.
+  - `404 Not Found`: User does not exist.
+  - `401 Unauthorized`: User not authorized.
+  - `400 Bad Request`: {"message": "string"}
   
 #### 10. User Deactivation
-- **Endpoint**: `/users/<int:user_id>/deactivate`
+- **Endpoint**: `/users/{id}/deactivate`
 - **Method**: `PUT`
 - **Description**: Deactivates a user account, preventing future logins.
 - **Responses**:
   - `200 OK`: User account successfully deactivated.
   - `404 Not Found`: User does not exist.
+  - `401 Unauthorized`: User not authorized.
+
+### Inquiry Management API
+
+#### 1. Inquiry Registration
+- **Endpoint**: `POST /inquiries`
+- **Description**: Register a new inquiry for a salon.
+- **Request Body**:
+  ```json
+  {
+      "salon_name": "sting",
+      "city": "sting",
+      "email": "sting",
+      "first_name": "sting",
+      "last_name": "sting",
+      "phone": "sting"
+  }
+  ```
+- **Responses**:
+  - `201 Created`: Inquiry created successfully.
+  - `400 Bad Request`: {"message": "string"}
+
+#### 2. Inquiries
+- **Endpoint**: `GET "/approver/inquiries", "/approver/inquiries/{status}"`
+- **Description**: Retrieve pending inquiries.
+- **Responses**:
+  - `200 OK`: Returns list of pending inquiries.
+  - `401 Unauthorized`: User not authorized.
+
+#### 3. Inquiry Approval
+- **Endpoint**: `PUT /approver/inquiries/{id}/approval`
+- **Description**: Approve an inquiry.
+- **Responses**:
+  - `200 OK`: Inquiry approved successfully.
+  - `404 Not Found`: Inquiry not found.
+  - `401 Unauthorized`: User not authorized.
+
+#### 4. Inquiry Rejection
+- **Endpoint**: `PUT /approver/inquiries/{id}/rejection`
+- **Description**: Reject an inquiry.
+- **Responses**:
+  - `200 OK`: Inquiry rejected successfully.
+  - `404 Not Found`: Inquiry not found.
+  - `401 Unauthorized`: User not authorized.
+
+#### 5. Inquiry No Show Status
+- **Endpoint**: `PUT /approver/inquiries/{id}/no-show`
+- **Description**: Mark an inquiry as no-show.
+- **Responses**:
+  - `200 OK`: Inquiry marked as no-show.
+  - `404 Not Found`: Inquiry not found.
+  - `401 Unauthorized`: User not authorized.
+
+
+### Provider Management API
+
+#### 1. Provider Registration
+- **Endpoint**: `POST /provider`
+- **Description**: Register a new service provider.
+- **Request Body**:
+  ```json
+  {
+      "company_name": "string",
+      "trade_name": "string",
+      "uic": "string",
+      "photo": "string",
+      "photo_extension": "string",
+      "inquiry_id": 15,
+      "country": "string",
+      "district": "string",
+      "city": "string",
+      "neighborhood": "string",
+      "street": "string",
+      "street_number": "string",
+      "block_number": "string",
+      "apartment": "string",
+      "floor": "string",
+      "postal_code": "string",
+      "latitude": "number",
+      "longitude": "number"
+  }
+  ```
+- **Responses**:
+  - `201 Created`: Provider registered successfully.
+  - `400 Bad Request`: {"message": "string"}.
+  - `401 Unauthorized`: User not authorized.
+
+#### 2. Provider Editing
+- **Endpoint**: `PUT /provider/{id}/edit`
+- **Description**: Update the provider's information.
+- **Request Body**:
+  ```json
+  {
+      "company_name": "string",
+      "trade_name": "string",
+      "country": "string",
+      "district": "string",
+      "city": "string",
+      "neighborhood": "string",
+      "street": "string",
+      "street_number": "string",
+      "block_number": "string",
+      "apartment": "string",
+      "floor": "string",
+      "postal_code": "string",
+      "latitude": "number",
+      "longitude": "number"
+  }
+  ```
+- **Responses**:
+  - `200 OK`: Provider updated successfully.
+  - `404 Not Found`: Provider not found.
+  - `400 Bad Request`: {"message": "string"}.
+  - `401 Unauthorized`: User not authorized.
+
+#### 3. Provider Profile
+- **Endpoint**: `GET "/providers/profile", "/providers/profile/{status}", "/providers/profile/{id}"`
+- **Description**: Retrieve provider profile.
+- **Responses**:
+  - `200 OK`: Returns provider profile data.
+  - `404 Not Found`: Provider not found.
+  - `401 Unauthorized`: User not authorized.
+
+#### 4. Provider Deactivate
+- **Endpoint**: `PUT /provider/{id}/deactivate`
+- **Description**: Deactivate a provider.
+- **Responses**:
+  - `200 OK`: Provider deactivated successfully.
+  - `404 Not Found`: Provider not found.
   - `401 Unauthorized`: User not authorized.
 
 ### Service Management API
@@ -329,9 +463,10 @@ For more details on how to configure the Swagger UI or to modify the Swagger JSO
 - **Responses**:
   - `201 Created`: Service registered successfully.
   - `400 Bad Request`: {"message": "string"}
+  - `401 Unauthorized`: User not authorized.
 
 #### 2. Service Profile
-- **Endpoint**: `GET /services/profile`
+- **Endpoint**: `GET "/services/profile", "/services/profile/{status}", "/services/profile/{id}"`
 - **Description**: Retrieve the list of services.
 - **Responses**:
   - `200 OK`: Returns the list of services.
@@ -354,6 +489,7 @@ For more details on how to configure the Swagger UI or to modify the Swagger JSO
   - `200 OK`: Service updated successfully.
   - `401 Unauthorized`: User not authenticated.
   - `404 Not Found`: Service not found.
+  - `400 Bad Request`: {"message": "string"}
 
 #### 4. Service Deactivate
 - **Endpoint**: `PUT /services/{id}/deactivate`
@@ -385,7 +521,7 @@ For more details on how to configure the Swagger UI or to modify the Swagger JSO
   ```
 
 #### 2. Category Profile
-- **Endpoint**: `GET /categories/profile`
+- **Endpoint**: `GET "/categories/profile","/categories/profile/{status}", "/categories/profile/{id}"`
 - **Description**: Retrieve the list of categories.
 - **Responses**:
   - `200 OK`: Returns the list of categories.
@@ -407,6 +543,7 @@ For more details on how to configure the Swagger UI or to modify the Swagger JSO
   - `200 OK`: Category updated successfully.
   - `401 Unauthorized`: User not authenticated.
   - `404 Not Found`: Category not found.
+  - `400 Bad Request`: Invalid input data.
 
 #### 4. Category Deactivate
 - **Endpoint**: `PUT /categories/{id}/deactivate`
@@ -433,7 +570,7 @@ For more details on how to configure the Swagger UI or to modify the Swagger JSO
   - `400 Bad Request`: {"message": "string"}
 
 #### 2. SubCategory Profile
-- **Endpoint**: `GET /subcategories/profile/{status}`
+- **Endpoint**: `GET "/subcategories/profile", "/subcategories/profile/{status}>","/subcategories/profile/{id}>"`
 - **Description**: Retrieve the list of subcategories.
 - **Responses**:
   - `200 OK`: Returns the list of subcategories.
@@ -452,6 +589,8 @@ For more details on how to configure the Swagger UI or to modify the Swagger JSO
 - **Responses**:
   - `200 OK`: Subcategory updated successfully.
   - `404 Not Found`: Subcategory not found.
+  - `401 Unauthorized`: User not authenticated.
+  - `400 Bad Request`: {"message": "string"}
 
 #### 4. SubCategory Deactivate
 - **Endpoint**: `PUT /subcategories/{id}/deactivate`
@@ -491,6 +630,7 @@ For more details on how to configure the Swagger UI or to modify the Swagger JSO
 - **Responses**:
   - `201 Created`: Working hours registered successfully.
   - `400 Bad Request`: Invalid input data.
+  - `400 Bad Request`: {"message": "string"}
   ```json
   {
     "message": "string"
@@ -498,7 +638,9 @@ For more details on how to configure the Swagger UI or to modify the Swagger JSO
   ```
 
 #### 2. Working Hour Profile
-- **Endpoint**: `GET /working_hours/profile/employee/{employee_id}`
+- **Endpoint**: `GET "/working_hours/profile",
+        "/working_hours/profile/provider/{provider_id}",
+        "/working_hours/profile/employee/{employee_id}"`
 - **Description**: Retrieve working hours for a specific employee.
 - **Responses**:
   - `200 OK`: Returns the employee's working hours.
@@ -522,6 +664,7 @@ For more details on how to configure the Swagger UI or to modify the Swagger JSO
   - `200 OK`: Working hour updated successfully.
   - `401 Unauthorized`: User not authenticated.
   - `404 Not Found`: Working hour not found.
+  - `400 Bad Request`: {"message": "string"}
 
 #### 4. Working Hour Deactivate
 - **Endpoint**: `PUT /working_hours/{id}/deactivate`
@@ -616,7 +759,15 @@ For more details on how to configure the Swagger UI or to modify the Swagger JSO
   - `401 Unauthorized`: User not authenticated.
   - `404 Not Found`: Appointment not found.
 
-#### 9. Staff Appointment Completion
+#### 9. Staff Appointment Cancellation
+- **Endpoint**: `PUT /appointments/{id}/cancel`
+- **Description**: Mark an appointment as cancel.
+- **Responses**:
+  - `200 OK`: Appointment marked as cancel.
+  - `401 Unauthorized`: User not authenticated.
+  - `404 Not Found`: Appointment not found.
+
+#### 10. Staff Appointment Completion
 - **Endpoint**: `PUT /appointments/{id}/complete`
 - **Description**: Mark an appointment as completed.
 - **Responses**:
